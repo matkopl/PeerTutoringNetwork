@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PeerTutoringNetwork.Models;
+using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<PeerTutoringNetworkContext>(options => {
     options.UseSqlServer("Name=ConnectionStrings:PeerTutoringNetworkConnStr");
 });
+builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 

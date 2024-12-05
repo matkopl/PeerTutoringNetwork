@@ -19,6 +19,8 @@ public partial class User
 
     public virtual ICollection<LoginAttempt> LoginAttempts { get; set; } = new List<LoginAttempt>();
 
+    public virtual ICollection<Message> Messages { get; set; } = new List<Message>();
+
     public virtual ICollection<PasswordReset> PasswordResets { get; set; } = new List<PasswordReset>();
 
     public virtual ICollection<Profile> Profiles { get; set; } = new List<Profile>();

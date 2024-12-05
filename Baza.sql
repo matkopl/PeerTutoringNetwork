@@ -111,6 +111,24 @@ CREATE TABLE Appointment_Reservations (
     FOREIGN KEY (student_id) REFERENCES [User](user_id) ON DELETE NO ACTION
 );
 
+-- 12. Kreiranje tablice 'Chat'
+CREATE TABLE Chat (
+    Id INT IDENTITY PRIMARY KEY,
+    Title NVARCHAR(100),
+    CreatedAt DATETIME DEFAULT GETDATE()
+);
+
+-- 13. Kreiranje tablice 'Message'
+CREATE TABLE Message (
+    Id INT IDENTITY PRIMARY KEY,
+    ChatId INT,
+    SenderId INT,
+    Content NVARCHAR(MAX),
+    SentAt DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (ChatId) REFERENCES Chat(Id),
+    FOREIGN KEY (SenderId) REFERENCES Users(user_id)
+);
+
 
 
 -- 12. Punjenje tablice Roles
@@ -176,4 +194,13 @@ VALUES
     (1, 1), 
     (2, 4), 
     (3, 1); 
-change the user table so it has first name and last name and remove it from profiles
+
+-- 20. Dodavanje testnih podataka u 'Chat'
+INSERT INTO Chat (Title) VALUES ('General Chat');
+INSERT INTO Chat (Title) VALUES ('Project Discussion');
+
+-- 21. Dodavanje testnih podataka u 'Message'
+INSERT INTO Message (ChatId, SenderId, Content) VALUES (1, 1, 'Hello, everyone!');
+INSERT INTO Message (ChatId, SenderId, Content) VALUES (1, 2, 'Hi there!');
+INSERT INTO Message (ChatId, SenderId, Content) VALUES (2, 3, 'How is the project going?');
+INSERT INTO Message (ChatId, SenderId, Content) VALUES (2, 1, 'We are making good progress.');

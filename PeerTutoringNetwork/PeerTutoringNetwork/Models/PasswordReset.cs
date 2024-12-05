@@ -11,9 +11,9 @@ public partial class PasswordReset
 
     public string ResetToken { get; set; } = null!;
 
-    public DateTime? CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 
-    public DateTime? ExpiresAt { get; set; }
+    public DateTime ExpiresAt { get; set; }
 
     public virtual User User { get; set; } = null!;
 }
