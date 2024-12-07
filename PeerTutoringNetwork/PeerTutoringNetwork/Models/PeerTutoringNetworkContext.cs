@@ -27,8 +27,6 @@ public partial class PeerTutoringNetworkContext : DbContext
 
     public virtual DbSet<PasswordReset> PasswordResets { get; set; }
 
-    public virtual DbSet<Profile> Profiles { get; set; }
-
     public virtual DbSet<Review> Reviews { get; set; }
 
     public virtual DbSet<Role> Roles { get; set; }
@@ -40,7 +38,7 @@ public partial class PeerTutoringNetworkContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-       => optionsBuilder.UseSqlServer("Name=ConnectionStrings:PeerTutoringNetworkConnStr");
+    => optionsBuilder.UseSqlServer("Name=ConnectionStrings:PeerTutoringNetworkConnStr");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -163,33 +161,6 @@ public partial class PeerTutoringNetworkContext : DbContext
                 .HasConstraintName("FK__Password___user___534D60F1");
         });
 
-        modelBuilder.Entity<Profile>(entity =>
-        {
-            entity.HasKey(e => e.ProfileId).HasName("PK__Profiles__AEBB701F2FBA68C0");
-
-            entity.Property(e => e.ProfileId).HasColumnName("profile_id");
-            entity.Property(e => e.Bio)
-                .HasColumnType("text")
-                .HasColumnName("bio");
-            entity.Property(e => e.FirstName)
-                .HasMaxLength(100)
-                .IsUnicode(false)
-                .HasColumnName("first_name");
-            entity.Property(e => e.LastName)
-                .HasMaxLength(100)
-                .IsUnicode(false)
-                .HasColumnName("last_name");
-            entity.Property(e => e.PhoneNumber)
-                .HasMaxLength(15)
-                .IsUnicode(false)
-                .HasColumnName("phone_number");
-            entity.Property(e => e.UserId).HasColumnName("user_id");
-
-            entity.HasOne(d => d.User).WithMany(p => p.Profiles)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__Profiles__user_i__4F7CD00D");
-        });
-
         modelBuilder.Entity<Review>(entity =>
         {
             entity.HasKey(e => e.ReviewId).HasName("PK__Reviews__60883D90ECAF78D0");
@@ -272,10 +243,20 @@ public partial class PeerTutoringNetworkContext : DbContext
             entity.HasIndex(e => e.Username, "UQ__Users__F3DBC5725A517F47").IsUnique();
 
             entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.Bio).HasColumnName("bio");
+            entity.Property(e => e.FirstName)
+                .HasMaxLength(100)
+                .HasColumnName("first_name");
+            entity.Property(e => e.LastName)
+                .HasMaxLength(100)
+                .HasColumnName("last_name");
             entity.Property(e => e.Password)
                 .HasMaxLength(255)
                 .IsUnicode(false)
                 .HasColumnName("password");
+            entity.Property(e => e.PhoneNumber)
+                .HasMaxLength(15)
+                .HasColumnName("phone_number");
             entity.Property(e => e.RoleId).HasColumnName("role_id");
             entity.Property(e => e.Username)
                 .HasMaxLength(100)

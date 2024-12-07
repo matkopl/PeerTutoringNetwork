@@ -1,3 +1,23 @@
+----------------------------------------------------------------------------------------------
+-- Ovo izvršite zadnje za update baze!!!
+ALTER TABLE Users
+ADD first_name NVARCHAR(100),
+    last_name NVARCHAR(100),
+    phone_number NVARCHAR(15),
+    bio NVARCHAR(MAX);
+
+-- Kopiranje podataka iz Profiles u Users
+UPDATE Users
+SET first_name = P.first_name,
+    last_name = P.last_name,
+    phone_number = P.phone_number,
+    bio = P.bio
+FROM Users U
+INNER JOIN Profiles P ON U.user_id = P.user_id;
+
+-- Brisanje tablice Profiles
+DROP TABLE Profiles;
+---------------------------------------------------------------------------------------------
 -- Kreiranje baze podataka
 CREATE DATABASE PeerTutoringNetwork;
 GO

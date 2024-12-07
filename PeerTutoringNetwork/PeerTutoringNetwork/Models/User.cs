@@ -13,6 +13,14 @@ public partial class User
 
     public int? RoleId { get; set; }
 
+    public string? FirstName { get; set; }
+
+    public string? LastName { get; set; }
+
+    public string? PhoneNumber { get; set; }
+
+    public string? Bio { get; set; }
+
     public virtual ICollection<AppointmentReservation> AppointmentReservations { get; set; } = new List<AppointmentReservation>();
 
     public virtual ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
@@ -22,8 +30,6 @@ public partial class User
     public virtual ICollection<Message> Messages { get; set; } = new List<Message>();
 
     public virtual ICollection<PasswordReset> PasswordResets { get; set; } = new List<PasswordReset>();
-
-    public virtual ICollection<Profile> Profiles { get; set; } = new List<Profile>();
 
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
 
