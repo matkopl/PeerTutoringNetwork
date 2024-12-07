@@ -88,9 +88,7 @@ CREATE TABLE Appointments (
     appointment_id INT IDENTITY(1,1) PRIMARY KEY,
     mentor_id INT NOT NULL,
     subject_id INT NOT NULL,
-    appointment_date DATE NOT NULL,
-    start_time TIME NOT NULL,
-    end_time TIME NOT NULL,
+    appointment_date DATETIME NOT NULL,
     FOREIGN KEY (mentor_id) REFERENCES [User](user_id) ON DELETE CASCADE,
     FOREIGN KEY (subject_id) REFERENCES Subjects(subject_id) ON DELETE CASCADE
 );
@@ -167,11 +165,11 @@ VALUES
     (5, 2);
 
 -- Punjenje tablice Appointments
-INSERT INTO Appointments (mentor_id, subject_id, appointment_date, start_time, end_time)
+INSERT INTO Appointments (mentor_id, subject_id, appointment_date)
 VALUES
-    (2, 1, '2024-12-10', '10:00', '11:00'), 
-    (5, 5, '2024-12-11', '14:00', '15:30'), 
-    (2, 2, '2024-12-12', '09:00', '10:30'); 
+    (2, 1, '2024-12-10 10:00'), 
+    (5, 5, '2024-12-11 15:30'), 
+    (2, 2, '2024-12-12 10:30'); 
 
 -- Punjenje tablice Appointment_Reservations
 INSERT INTO Appointment_Reservations (appointment_id, student_id)
