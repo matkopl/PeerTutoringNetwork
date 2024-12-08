@@ -16,7 +16,8 @@ CREATE TABLE Roles (
 CREATE TABLE [User] (
     user_id INT IDENTITY(1,1) PRIMARY KEY,
     username NVARCHAR(100) NOT NULL UNIQUE,
-    password NVARCHAR(255) NOT NULL,
+    [PwdHash] [nvarchar](256) NOT NULL, 
+    [PwdSalt] [nvarchar](256) NOT NULL,
 	first_name NVARCHAR(100),
     last_name NVARCHAR(100),
     phone_number NVARCHAR(20),
@@ -122,7 +123,7 @@ CREATE TABLE Message (
 );
 
 
-
+/*
 -- Punjenje tablice Roles
 SET IDENTITY_INSERT Roles ON;
 INSERT INTO Roles (role_id, role_name) VALUES (1, 'Student'), (2, 'Teacher'), (3, 'Admin');
