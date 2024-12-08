@@ -8,8 +8,6 @@ namespace PeerTutoringNetwork.DTOs
         public int AppointmentId { get; set; } 
         public int StudentId { get; set; } 
         public string StudentName { get; set; } 
-        public DateOnly AppointmentDate { get; set; } 
-        public TimeOnly StartTime { get; set; } 
-        public TimeOnly EndTime { get; set; } 
+        public DateTime AppointmentDate { get; set; } 
     }
 }

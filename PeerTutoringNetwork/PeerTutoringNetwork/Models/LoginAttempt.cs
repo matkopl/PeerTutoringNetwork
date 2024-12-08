@@ -9,7 +9,7 @@ public partial class LoginAttempt
 
     public int UserId { get; set; }
 
-    public DateTime Timestamp { get; set; }
+    public DateTime? Timestamp { get; set; }
 
     public bool Successful { get; set; }
 

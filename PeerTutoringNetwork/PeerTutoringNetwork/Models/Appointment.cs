@@ -11,11 +11,7 @@ public partial class Appointment
 
     public int SubjectId { get; set; }
 
-    public DateOnly AppointmentDate { get; set; }
-
-    public TimeOnly StartTime { get; set; }
-
-    public TimeOnly EndTime { get; set; }
+    public DateTime AppointmentDate { get; set; }
 
     public virtual ICollection<AppointmentReservation> AppointmentReservations { get; set; } = new List<AppointmentReservation>();
 

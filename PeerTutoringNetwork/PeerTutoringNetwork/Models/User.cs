@@ -11,8 +11,6 @@ public partial class User
 
     public string Password { get; set; } = null!;
 
-    public int? RoleId { get; set; }
-
     public string? FirstName { get; set; }
 
     public string? LastName { get; set; }
@@ -20,6 +18,8 @@ public partial class User
     public string? PhoneNumber { get; set; }
 
     public string? Bio { get; set; }
+
+    public int? RoleId { get; set; }
 
     public virtual ICollection<AppointmentReservation> AppointmentReservations { get; set; } = new List<AppointmentReservation>();
 

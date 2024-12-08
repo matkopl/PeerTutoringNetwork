@@ -33,10 +33,8 @@ namespace PeerTutoringNetwork.Controllers
                         ReservationId = r.ReservationId,
                         AppointmentId = r.AppointmentId,
                         StudentId = r.StudentId,
-                        StudentName = $"{r.Student.Profiles.FirstOrDefault().FirstName} {r.Student.Profiles.FirstOrDefault().LastName}",
+                        StudentName = $"{r.Student.FirstName} {r.Student.LastName}",
                         AppointmentDate = r.Appointment.AppointmentDate,
-                        StartTime = r.Appointment.StartTime,
-                        EndTime = r.Appointment.EndTime
                     })
                     .ToListAsync();
 
@@ -61,10 +59,8 @@ namespace PeerTutoringNetwork.Controllers
                     ReservationId = r.ReservationId,
                     AppointmentId = r.AppointmentId,
                     StudentId = r.StudentId,
-                    StudentName = $"{r.Student.Profiles.FirstOrDefault().FirstName} {r.Student.Profiles.FirstOrDefault().LastName}",
-                    AppointmentDate = r.Appointment.AppointmentDate,
-                    StartTime = r.Appointment.StartTime,
-                    EndTime = r.Appointment.EndTime
+                    StudentName = $"{r.Student.FirstName} {r.Student.LastName}",
+                    AppointmentDate = r.Appointment.AppointmentDate
                 })
                 .FirstOrDefaultAsync();
 
