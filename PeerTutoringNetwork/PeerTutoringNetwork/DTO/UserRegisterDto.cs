@@ -14,20 +14,19 @@ namespace PeerTutoringNetwork.DTOs
         public string Password { get; set; }
 
         [Required(ErrorMessage = "First name is required")]
-        [StringLength(100, MinimumLength = 2, ErrorMessage = "First name should be between 2 and 100 characters long")]
+        [StringLength(50, MinimumLength = 2, ErrorMessage = "First name should be between 2 and 50 characters long")]
         public string FirstName { get; set; }
 
         [Required(ErrorMessage = "Last name is required")]
-        [StringLength(100, MinimumLength = 2, ErrorMessage = "Last name should be between 2 and 100 characters long")]
+        [StringLength(50, MinimumLength = 2, ErrorMessage = "Last name should be between 2 and 50 characters long")]
         public string LastName { get; set; }
 
-        [StringLength(500, ErrorMessage = "Bio should not exceed 500 characters")]
-        public string Bio { get; set; }
+        [EmailAddress(ErrorMessage = "Provide a correct e-mail address")]
+        public string Email { get; set; }
 
         [Phone(ErrorMessage = "Provide a correct phone number")]
-        [StringLength(20, ErrorMessage = "Phone number should not exceed 20 characters")]
-        public string PhoneNumber { get; set; }
-
+        public string Phone { get; set; }
+    
         [Required(ErrorMessage = "Role ID is required")]
         public int RoleId { get; set; }
     }

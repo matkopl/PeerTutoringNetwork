@@ -44,7 +44,7 @@ public partial class PeerTutoringNetworkContext : DbContext
     {
         modelBuilder.Entity<Appointment>(entity =>
         {
-            entity.HasKey(e => e.AppointmentId).HasName("PK__Appointm__A50828FC5337909D");
+            entity.HasKey(e => e.AppointmentId).HasName("PK__Appointm__A50828FCF3D16CF2");
 
             entity.Property(e => e.AppointmentId).HasColumnName("appointment_id");
             entity.Property(e => e.AppointmentDate)
@@ -55,16 +55,16 @@ public partial class PeerTutoringNetworkContext : DbContext
 
             entity.HasOne(d => d.Mentor).WithMany(p => p.Appointments)
                 .HasForeignKey(d => d.MentorId)
-                .HasConstraintName("FK__Appointme__mento__68487DD7");
+                .HasConstraintName("FK__Appointme__mento__72C60C4A");
 
             entity.HasOne(d => d.Subject).WithMany(p => p.Appointments)
                 .HasForeignKey(d => d.SubjectId)
-                .HasConstraintName("FK__Appointme__subje__693CA210");
+                .HasConstraintName("FK__Appointme__subje__73BA3083");
         });
 
         modelBuilder.Entity<AppointmentReservation>(entity =>
         {
-            entity.HasKey(e => e.ReservationId).HasName("PK__Appointm__31384C298D828762");
+            entity.HasKey(e => e.ReservationId).HasName("PK__Appointm__31384C29EC3E9051");
 
             entity.ToTable("Appointment_Reservations");
 
@@ -78,29 +78,33 @@ public partial class PeerTutoringNetworkContext : DbContext
 
             entity.HasOne(d => d.Appointment).WithMany(p => p.AppointmentReservations)
                 .HasForeignKey(d => d.AppointmentId)
-                .HasConstraintName("FK__Appointme__appoi__6D0D32F4");
+                .HasConstraintName("FK__Appointme__appoi__778AC167");
 
             entity.HasOne(d => d.Student).WithMany(p => p.AppointmentReservations)
                 .HasForeignKey(d => d.StudentId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Appointme__stude__6E01572D");
+                .HasConstraintName("FK__Appointme__stude__787EE5A0");
         });
 
         modelBuilder.Entity<Chat>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Chat__3214EC073E9F08D4");
+            entity.HasKey(e => e.ChatId).HasName("PK__Chat__FD040B17F827A86D");
 
             entity.ToTable("Chat");
 
+            entity.Property(e => e.ChatId).HasColumnName("chat_id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.Title).HasMaxLength(100);
+                .HasColumnType("datetime")
+                .HasColumnName("created_at");
+            entity.Property(e => e.Title)
+                .HasMaxLength(100)
+                .HasColumnName("title");
         });
 
         modelBuilder.Entity<LoginAttempt>(entity =>
         {
-            entity.HasKey(e => e.AttemptId).HasName("PK__Login_At__5621F949A040B65B");
+            entity.HasKey(e => e.AttemptId).HasName("PK__Login_At__5621F949C035964C");
 
             entity.ToTable("Login_Attempts");
 
@@ -114,33 +118,40 @@ public partial class PeerTutoringNetworkContext : DbContext
 
             entity.HasOne(d => d.User).WithMany(p => p.LoginAttempts)
                 .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__Login_Att__user___5535A963");
+                .HasConstraintName("FK__Login_Att__user___5FB337D6");
         });
 
         modelBuilder.Entity<Message>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Message__3214EC07B847529A");
+            entity.HasKey(e => e.MessageId).HasName("PK__Messages__0BBF6EE621E77BDF");
 
-            entity.ToTable("Message");
-
+            entity.Property(e => e.MessageId).HasColumnName("message_id");
+            entity.Property(e => e.ChatId).HasColumnName("chat_id");
+            entity.Property(e => e.Content).HasColumnName("content");
+            entity.Property(e => e.SenderId).HasColumnName("sender_id");
             entity.Property(e => e.SentAt)
                 .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
+                .HasColumnType("datetime")
+                .HasColumnName("sent_at");
 
             entity.HasOne(d => d.Chat).WithMany(p => p.Messages)
                 .HasForeignKey(d => d.ChatId)
-                .HasConstraintName("FK__Message__ChatId__74AE54BC");
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Messages__chat_i__7F2BE32F");
 
             entity.HasOne(d => d.Sender).WithMany(p => p.Messages)
                 .HasForeignKey(d => d.SenderId)
-                .HasConstraintName("FK__Message__SenderI__75A278F5");
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Messages__sender__00200768");
         });
 
         modelBuilder.Entity<PasswordReset>(entity =>
         {
-            entity.HasKey(e => e.ResetId).HasName("PK__Password__40FB05207FEF9C56");
+            entity.HasKey(e => e.ResetId).HasName("PK__Password__40FB052011C4C40A");
 
             entity.ToTable("Password_Resets");
+
+            entity.HasIndex(e => e.ResetToken, "UQ__Password__25F405EBED10A971").IsUnique();
 
             entity.Property(e => e.ResetId).HasColumnName("reset_id");
             entity.Property(e => e.CreatedAt)
@@ -157,12 +168,12 @@ public partial class PeerTutoringNetworkContext : DbContext
 
             entity.HasOne(d => d.User).WithMany(p => p.PasswordResets)
                 .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__Password___user___5165187F");
+                .HasConstraintName("FK__Password___user___5BE2A6F2");
         });
 
         modelBuilder.Entity<Review>(entity =>
         {
-            entity.HasKey(e => e.ReviewId).HasName("PK__Reviews__60883D90793A1F32");
+            entity.HasKey(e => e.ReviewId).HasName("PK__Reviews__60883D908691E172");
 
             entity.Property(e => e.ReviewId).HasColumnName("review_id");
             entity.Property(e => e.Comment)
@@ -178,18 +189,18 @@ public partial class PeerTutoringNetworkContext : DbContext
 
             entity.HasOne(d => d.Subject).WithMany(p => p.Reviews)
                 .HasForeignKey(d => d.SubjectId)
-                .HasConstraintName("FK__Reviews__subject__619B8048");
+                .HasConstraintName("FK__Reviews__subject__6C190EBB");
 
             entity.HasOne(d => d.User).WithMany(p => p.Reviews)
                 .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__Reviews__user_id__60A75C0F");
+                .HasConstraintName("FK__Reviews__user_id__6B24EA82");
         });
 
         modelBuilder.Entity<Role>(entity =>
         {
-            entity.HasKey(e => e.RoleId).HasName("PK__Roles__760965CC704A051B");
+            entity.HasKey(e => e.RoleId).HasName("PK__Roles__760965CCBF72D31B");
 
-            entity.HasIndex(e => e.RoleName, "UQ__Roles__783254B155BE72AD").IsUnique();
+            entity.HasIndex(e => e.RoleName, "UQ__Roles__783254B1FAD611CF").IsUnique();
 
             entity.Property(e => e.RoleId).HasColumnName("role_id");
             entity.Property(e => e.RoleName)
@@ -199,7 +210,7 @@ public partial class PeerTutoringNetworkContext : DbContext
 
         modelBuilder.Entity<Session>(entity =>
         {
-            entity.HasKey(e => e.SessionId).HasName("PK__Sessions__69B13FDC61474F2F");
+            entity.HasKey(e => e.SessionId).HasName("PK__Sessions__69B13FDCF7BD8B2F");
 
             entity.Property(e => e.SessionId).HasColumnName("session_id");
             entity.Property(e => e.LoginTime)
@@ -213,12 +224,12 @@ public partial class PeerTutoringNetworkContext : DbContext
 
             entity.HasOne(d => d.User).WithMany(p => p.Sessions)
                 .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__Sessions__user_i__59063A47");
+                .HasConstraintName("FK__Sessions__user_i__6383C8BA");
         });
 
         modelBuilder.Entity<Subject>(entity =>
         {
-            entity.HasKey(e => e.SubjectId).HasName("PK__Subjects__5004F660BA1804DF");
+            entity.HasKey(e => e.SubjectId).HasName("PK__Subjects__5004F660A99D0F0D");
 
             entity.Property(e => e.SubjectId).HasColumnName("subject_id");
             entity.Property(e => e.CreatedByUserId).HasColumnName("created_by_user_id");
@@ -232,53 +243,60 @@ public partial class PeerTutoringNetworkContext : DbContext
             entity.HasOne(d => d.CreatedByUser).WithMany(p => p.Subjects)
                 .HasForeignKey(d => d.CreatedByUserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Subjects__create__5BE2A6F2");
+                .HasConstraintName("FK__Subjects__create__66603565");
         });
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__User__B9BE370FB802D047");
+            entity.HasKey(e => e.UserId).HasName("PK__Users__B9BE370F19F224EF");
 
-            entity.ToTable("User");
+            entity.HasIndex(e => e.Email, "UQ__Users__AB6E61641FA4B29F").IsUnique();
 
-            entity.HasIndex(e => e.Username, "UQ__User__F3DBC57204DFB872").IsUnique();
+            entity.HasIndex(e => e.Username, "UQ__Users__F3DBC5727EAEEE66").IsUnique();
 
             entity.Property(e => e.UserId).HasColumnName("user_id");
-            entity.Property(e => e.Bio)
-                .HasMaxLength(500)
-                .HasColumnName("bio");
+            entity.Property(e => e.Email)
+                .HasMaxLength(256)
+                .HasColumnName("email");
             entity.Property(e => e.FirstName)
-                .HasMaxLength(100)
+                .HasMaxLength(256)
                 .HasColumnName("first_name");
             entity.Property(e => e.LastName)
-                .HasMaxLength(100)
+                .HasMaxLength(256)
                 .HasColumnName("last_name");
-            entity.Property(e => e.PhoneNumber)
+            entity.Property(e => e.Phone)
                 .HasMaxLength(20)
-                .HasColumnName("phone_number");
-            entity.Property(e => e.PwdHash).HasMaxLength(256);
-            entity.Property(e => e.PwdSalt).HasMaxLength(256);
+                .HasColumnName("phone");
+            entity.Property(e => e.PwdHash)
+                .HasMaxLength(256)
+                .IsFixedLength()
+                .HasColumnName("pwd_hash");
+            entity.Property(e => e.PwdSalt)
+                .HasMaxLength(256)
+                .IsFixedLength()
+                .HasColumnName("pwd_salt");
             entity.Property(e => e.RoleId).HasColumnName("role_id");
             entity.Property(e => e.Username)
-                .HasMaxLength(100)
+                .HasMaxLength(50)
                 .HasColumnName("username");
 
             entity.HasOne(d => d.Role).WithMany(p => p.Users)
                 .HasForeignKey(d => d.RoleId)
-                .HasConstraintName("FK__User__role_id__4D94879B");
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Users__role_id__571DF1D5");
 
             entity.HasMany(d => d.Roles).WithMany(p => p.UsersNavigation)
                 .UsingEntity<Dictionary<string, object>>(
                     "UserRole",
                     r => r.HasOne<Role>().WithMany()
                         .HasForeignKey("RoleId")
-                        .HasConstraintName("FK__User_Role__role___656C112C"),
+                        .HasConstraintName("FK__User_Role__role___6FE99F9F"),
                     l => l.HasOne<User>().WithMany()
                         .HasForeignKey("UserId")
-                        .HasConstraintName("FK__User_Role__user___6477ECF3"),
+                        .HasConstraintName("FK__User_Role__user___6EF57B66"),
                     j =>
                     {
-                        j.HasKey("UserId", "RoleId").HasName("PK__User_Rol__6EDEA15301343A69");
+                        j.HasKey("UserId", "RoleId").HasName("PK__User_Rol__6EDEA153E7C0AE48");
                         j.ToTable("User_Roles");
                         j.IndexerProperty<int>("UserId").HasColumnName("user_id");
                         j.IndexerProperty<int>("RoleId").HasColumnName("role_id");
