@@ -5,7 +5,7 @@ namespace BL.Models;
 
 public partial class Chat
 {
-    public int Id { get; set; }
+    public int ChatId { get; set; }
 
     public string? Title { get; set; }
 

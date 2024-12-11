@@ -38,8 +38,7 @@ public partial class PeerTutoringNetworkContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("server=.;Database=PeerTutoringNetwork;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=true");
+    => optionsBuilder.UseSqlServer("Name=ConnectionStrings:PeerTutoringNetworkConnStr");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -93,10 +92,14 @@ public partial class PeerTutoringNetworkContext : DbContext
 
             entity.ToTable("Chat");
 
+            entity.Property(e => e.ChatId).HasColumnName("chat_id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.Title).HasMaxLength(100);
+                .HasColumnType("datetime")
+                .HasColumnName("created_at");
+            entity.Property(e => e.Title)
+                .HasMaxLength(100)
+                .HasColumnName("title");
         });
 
         modelBuilder.Entity<LoginAttempt>(entity =>
@@ -124,9 +127,14 @@ public partial class PeerTutoringNetworkContext : DbContext
 
             entity.ToTable("Message");
 
+            entity.Property(e => e.MessageId).HasColumnName("message_id");
+            entity.Property(e => e.ChatId).HasColumnName("chat_id");
+            entity.Property(e => e.Content).HasColumnName("content");
+            entity.Property(e => e.SenderId).HasColumnName("sender_id");
             entity.Property(e => e.SentAt)
                 .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
+                .HasColumnType("datetime")
+                .HasColumnName("sent_at");
 
             entity.HasOne(d => d.Chat).WithMany(p => p.Messages)
                 .HasForeignKey(d => d.ChatId)
@@ -142,6 +150,8 @@ public partial class PeerTutoringNetworkContext : DbContext
             entity.HasKey(e => e.ResetId).HasName("PK__Password__40FB0520C0141C9F");
 
             entity.ToTable("Password_Resets");
+
+            entity.HasIndex(e => e.ResetToken, "UQ__Password__25F405EBED10A971").IsUnique();
 
             entity.Property(e => e.ResetId).HasColumnName("reset_id");
             entity.Property(e => e.CreatedAt)
@@ -240,28 +250,34 @@ public partial class PeerTutoringNetworkContext : DbContext
         {
             entity.HasKey(e => e.UserId).HasName("PK__User__B9BE370FC3CDB26E");
 
-            entity.ToTable("User");
+            entity.HasIndex(e => e.Email, "UQ__Users__AB6E61641FA4B29F").IsUnique();
 
             entity.HasIndex(e => e.Username, "UQ__User__F3DBC572E0387940").IsUnique();
 
             entity.Property(e => e.UserId).HasColumnName("user_id");
-            entity.Property(e => e.Bio)
-                .HasMaxLength(500)
-                .HasColumnName("bio");
+            entity.Property(e => e.Email)
+                .HasMaxLength(256)
+                .HasColumnName("email");
             entity.Property(e => e.FirstName)
-                .HasMaxLength(100)
+                .HasMaxLength(256)
                 .HasColumnName("first_name");
             entity.Property(e => e.LastName)
-                .HasMaxLength(100)
+                .HasMaxLength(256)
                 .HasColumnName("last_name");
-            entity.Property(e => e.PhoneNumber)
+            entity.Property(e => e.Phone)
                 .HasMaxLength(20)
-                .HasColumnName("phone_number");
-            entity.Property(e => e.PwdHash).HasMaxLength(256);
-            entity.Property(e => e.PwdSalt).HasMaxLength(256);
+                .HasColumnName("phone");
+            entity.Property(e => e.PwdHash)
+                .HasMaxLength(256)
+                .IsFixedLength()
+                .HasColumnName("pwd_hash");
+            entity.Property(e => e.PwdSalt)
+                .HasMaxLength(256)
+                .IsFixedLength()
+                .HasColumnName("pwd_salt");
             entity.Property(e => e.RoleId).HasColumnName("role_id");
             entity.Property(e => e.Username)
-                .HasMaxLength(100)
+                .HasMaxLength(50)
                 .HasColumnName("username");
 
             entity.HasOne(d => d.Role).WithMany(p => p.Users)

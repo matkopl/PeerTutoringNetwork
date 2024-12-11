@@ -1,10 +1,4 @@
----------------------------------------------------------------------------------------------
--- Kreiranje baze podataka
-CREATE DATABASE PeerTutoringNetwork;
-GO
 
-USE PeerTutoringNetwork;
-GO
 
 -- 1. Kreiranje tablice Roles
 CREATE TABLE Roles (
@@ -12,17 +6,17 @@ CREATE TABLE Roles (
     role_name NVARCHAR(50) NOT NULL UNIQUE
 );
 
--- 2. Kreiranje tablice User
-CREATE TABLE [User] (
+-- 2. Kreiranje tablice Users
+CREATE TABLE Users (
     user_id INT IDENTITY(1,1) PRIMARY KEY,
-    username NVARCHAR(100) NOT NULL UNIQUE,
-    [PwdHash] [nvarchar](256) NOT NULL, 
-    [PwdSalt] [nvarchar](256) NOT NULL,
-	first_name NVARCHAR(100),
-    last_name NVARCHAR(100),
-    phone_number NVARCHAR(20),
-    bio NVARCHAR(500),
-    role_id INT,
+    username NVARCHAR(50) NOT NULL UNIQUE,
+    pwd_hash BINARY(256) NOT NULL,
+    pwd_salt BINARY(256) NOT NULL,
+    first_name NVARCHAR(256) NOT NULL,
+    last_name NVARCHAR(256) NOT NULL,
+    email NVARCHAR(256) NOT NULL UNIQUE,
+    phone NVARCHAR(20) NULL,
+    role_id INT NOT NULL,
     FOREIGN KEY (role_id) REFERENCES Roles(role_id)
 );
 
@@ -30,28 +24,28 @@ CREATE TABLE [User] (
 CREATE TABLE Password_Resets (
     reset_id INT IDENTITY(1,1) PRIMARY KEY,
     user_id INT NOT NULL,
-    reset_token NVARCHAR(255) NOT NULL,
-    created_at DATETIME DEFAULT GETDATE(),
-    expires_at DATETIME,
-    FOREIGN KEY (user_id) REFERENCES [User](user_id) ON DELETE CASCADE
+    reset_token NVARCHAR(255) NOT NULL UNIQUE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    expires_at DATETIME NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
 -- 4. Kreiranje tablice Login_Attempts
 CREATE TABLE Login_Attempts (
     attempt_id INT IDENTITY(1,1) PRIMARY KEY,
     user_id INT NOT NULL,
-    timestamp DATETIME DEFAULT GETDATE(),
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
     successful BIT NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES [User](user_id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
 -- 5. Kreiranje tablice Sessions
 CREATE TABLE Sessions (
     session_id INT IDENTITY(1,1) PRIMARY KEY,
     user_id INT NOT NULL,
-    login_time DATETIME DEFAULT GETDATE(),
+    login_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     logout_time DATETIME NULL,
-    FOREIGN KEY (user_id) REFERENCES [User](user_id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
 -- 6. Kreiranje tablice Subjects
@@ -60,7 +54,7 @@ CREATE TABLE Subjects (
     subject_name NVARCHAR(100) NOT NULL,
     description NVARCHAR(255),
     created_by_user_id INT NOT NULL,
-    FOREIGN KEY (created_by_user_id) REFERENCES [User](user_id)
+    FOREIGN KEY (created_by_user_id) REFERENCES Users(user_id)
 );
 
 -- 7. Kreiranje tablice Reviews
@@ -70,17 +64,17 @@ CREATE TABLE Reviews (
     subject_id INT NOT NULL,
     rating INT CHECK (rating BETWEEN 1 AND 5),
     comment NVARCHAR(500),
-    created_at DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (user_id) REFERENCES [User](user_id) ON DELETE CASCADE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (subject_id) REFERENCES Subjects(subject_id) ON DELETE CASCADE
 );
 
--- 8. Kreiranje tablice User_Roles (Bridge tablica za više uloga po korisniku)
+-- 8. Kreiranje tablice User_Roles (Ako podrï¿½avate viï¿½e uloga)
 CREATE TABLE User_Roles (
     user_id INT NOT NULL,
     role_id INT NOT NULL,
     PRIMARY KEY (user_id, role_id),
-    FOREIGN KEY (user_id) REFERENCES [User](user_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (role_id) REFERENCES Roles(role_id) ON DELETE CASCADE
 );
 
@@ -90,7 +84,7 @@ CREATE TABLE Appointments (
     mentor_id INT NOT NULL,
     subject_id INT NOT NULL,
     appointment_date DATETIME NOT NULL,
-    FOREIGN KEY (mentor_id) REFERENCES [User](user_id) ON DELETE CASCADE,
+    FOREIGN KEY (mentor_id) REFERENCES Users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (subject_id) REFERENCES Subjects(subject_id) ON DELETE CASCADE
 );
 
@@ -99,27 +93,27 @@ CREATE TABLE Appointment_Reservations (
     reservation_id INT IDENTITY(1,1) PRIMARY KEY,
     appointment_id INT NOT NULL,
     student_id INT NOT NULL,
-    reservation_time DATETIME DEFAULT GETDATE(),
+    reservation_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (appointment_id) REFERENCES Appointments(appointment_id) ON DELETE CASCADE,
-    FOREIGN KEY (student_id) REFERENCES [User](user_id) ON DELETE NO ACTION
+    FOREIGN KEY (student_id) REFERENCES Users(user_id) ON DELETE NO ACTION
 );
 
--- 11. Kreiranje tablice 'Chat'
+-- 11. Kreiranje tablice Chat
 CREATE TABLE Chat (
-    Id INT IDENTITY PRIMARY KEY,
-    Title NVARCHAR(100),
-    CreatedAt DATETIME DEFAULT GETDATE()
+    chat_id INT IDENTITY PRIMARY KEY,
+    title NVARCHAR(100),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- 12. Kreiranje tablice 'Message'
-CREATE TABLE Message (
-    Id INT IDENTITY PRIMARY KEY,
-    ChatId INT,
-    SenderId INT,
-    Content NVARCHAR(MAX),
-    SentAt DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (ChatId) REFERENCES Chat(Id),
-    FOREIGN KEY (SenderId) REFERENCES [User](user_id)
+-- 12. Kreiranje tablice Messages
+CREATE TABLE Messages (
+    message_id INT IDENTITY PRIMARY KEY,
+    chat_id INT NOT NULL,
+    sender_id INT NOT NULL,
+    content NVARCHAR(MAX),
+    sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (chat_id) REFERENCES Chat(chat_id),
+    FOREIGN KEY (sender_id) REFERENCES Users(user_id)
 );
 
 
@@ -162,8 +156,8 @@ VALUES
     (1, 1),
     (2, 2),
     (3, 3),
-    (4, 1),
-    (5, 2);
+    (4,ï¿½1),
+ï¿½ï¿½ï¿½ï¿½(5,ï¿½2);
 
 -- Punjenje tablice Appointments
 INSERT INTO Appointments (mentor_id, subject_id, appointment_date)
