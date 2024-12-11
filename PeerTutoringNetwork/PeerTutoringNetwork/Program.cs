@@ -1,32 +1,24 @@
 using Microsoft.EntityFrameworkCore;
-using PeerTutoringNetwork.Models;
-using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
+using BL.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<PeerTutoringNetworkContext>(options => {
-    options.UseSqlServer("Name=ConnectionStrings:PeerTutoringNetworkConnStr");
+builder.Services.AddControllersWithViews(); 
+builder.Services.AddDbContext<PeerTutoringNetworkContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("PeerTutoringNetworkConnStr"));
 });
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
+app.UseRouting();
 app.UseAuthorization();
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=MentorDashboard}/{action=Index}/{id?}");
 
-app.MapControllers();
+app.MapRazorPages();
 
 app.Run();

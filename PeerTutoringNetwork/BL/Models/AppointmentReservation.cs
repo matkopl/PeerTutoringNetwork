@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
-namespace PeerTutoringNetwork.Models;
+namespace BL.Models;
 
 public partial class AppointmentReservation
 {
     public int ReservationId { get; set; }
 
+    [Required]
     public int AppointmentId { get; set; }
 
+    [Required]
     public int StudentId { get; set; }
 
     public DateTime? ReservationTime { get; set; }

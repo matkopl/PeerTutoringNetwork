@@ -1,0 +1,83 @@
+﻿@model PeerTutoringNetwork.Viewmodels.MentorDashboardVM
+
+@{
+    ViewData["Title"] = "Mentor Dashboard";
+}
+
+<nav class="mb-4">
+    <a href="/Reservations" class="btn btn-primary">View All Reservations</a>
+    <a href="/Subjects" class="btn btn-secondary">View All Subjects</a>
+</nav>
+
+<h1 class="text-center">Mentor Dashboard</h1>
+
+<div class="container">
+    <!-- Dashboard Summary -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h4>Total Reservations</h4>
+                    <p class="display-4">@Model.TotalReservations</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h4>Total Subjects</h4>
+                    <p class="display-4">@Model.TotalSubjects</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <input type="text" id="reservationSearch" 
+            class="form-control mb-3" placeholder="Search reservations...">
+    </div>
+
+    <!-- Recent Reservations -->
+    <h3>Recent Reservations</h3>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Reservation ID</th>
+                <th>Student</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var reservation in Model.RecentReservations)
+            {
+                <tr>
+                    <td>@reservation.ReservationId</td>
+                    <td>@reservation.StudentId</td>
+                    <td>@reservation.ReservationTime.ToString()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Recent Subjects -->
+    <h3>Recent Subjects</h3>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Subject ID</th>
+                <th>Name</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var subject in Model.RecentSubjects)
+            {
+                <tr>
+                    <td>@subject.SubjectId</td>
+                    <td>@subject.SubjectName</td>
+                    <td>@subject.Description</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

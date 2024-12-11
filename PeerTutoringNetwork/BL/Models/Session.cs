@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace PeerTutoringNetwork.Models;
+namespace BL.Models;
 
 public partial class Session
 {
