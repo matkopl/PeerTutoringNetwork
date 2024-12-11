@@ -5,7 +5,7 @@ namespace PeerTutoringNetwork.Models;
 
 public partial class Chat
 {
-    public int ChatId { get; set; }
+    public int Id { get; set; }
 
     public string? Title { get; set; }
 
