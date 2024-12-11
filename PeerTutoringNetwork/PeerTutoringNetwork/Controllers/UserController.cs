@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using BL.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PeerTutoringNetwork.DTOs;
-using PeerTutoringNetwork.Models;
 using PeerTutoringNetwork.Security;
 
 namespace PeerTutoringNetwork.Controllers

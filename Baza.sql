@@ -1,4 +1,8 @@
+create database PeerTutoringNetwork
+go
 
+use PeerTutoringNetwork
+go
 
 -- 1. Kreiranje tablice Roles
 CREATE TABLE Roles (

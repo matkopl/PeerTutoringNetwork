@@ -62,8 +62,8 @@ namespace PeerTutoringNetwork.Controllers
         {
 
 
-                _context.Add(appointmentReservation);
-                await _context.SaveChangesAsync();
+            _context.Add(appointmentReservation);
+            await _context.SaveChangesAsync();
 
             ViewData["AppointmentId"] = new SelectList(_context.Appointments, "AppointmentId", "AppointmentId", appointmentReservation.AppointmentId);
             ViewData["StudentId"] = new SelectList(_context.Users, "UserId", "Username", appointmentReservation.StudentId);
@@ -100,6 +100,10 @@ namespace PeerTutoringNetwork.Controllers
                 return NotFound();
             }
 
+            ModelState.Remove("Student");
+            ModelState.Remove("Appointment");
+
+
             if (ModelState.IsValid)
             {
                 try
@@ -119,6 +123,14 @@ namespace PeerTutoringNetwork.Controllers
                     }
                 }
                 return RedirectToAction(nameof(Index));
+            }
+            foreach (var entry in ModelState)
+            {
+                Console.WriteLine($"Key: {entry.Key}, AttemptedValue: {entry.Value.AttemptedValue}");
+                foreach (var error in entry.Value.Errors)
+                {
+                    Console.WriteLine($"Error: {error.ErrorMessage}");
+                }
             }
             ViewData["AppointmentId"] = new SelectList(_context.Appointments, "AppointmentId", "AppointmentId", appointmentReservation.AppointmentId);
             ViewData["StudentId"] = new SelectList(_context.Users, "UserId", "Username", appointmentReservation.StudentId);
