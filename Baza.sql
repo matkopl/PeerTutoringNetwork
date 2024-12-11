@@ -187,4 +187,4 @@ INSERT INTO Chat (Title) VALUES ('Project Discussion');
 INSERT INTO Message (ChatId, SenderId, Content) VALUES (1, 1, 'Hello, everyone!');
 INSERT INTO Message (ChatId, SenderId, Content) VALUES (1, 2, 'Hi there!');
 INSERT INTO Message (ChatId, SenderId, Content) VALUES (2, 3, 'How is the project going?');
-INSERT INTO Message (ChatId, SenderId, Content) VALUES (2, 1, 'We are making good progress.');
+INSERT INTO Message (ChatId, SenderId, Content) VALUES (2, 1, 'We are making good progress.'); */
