@@ -1,55 +1,38 @@
-﻿@model IEnumerable<BL.Models.Appointment>
+﻿@model IEnumerable<PeerTutoringNetwork.Viewmodels.AppointmentVM>
 
 @{
-    Layout = null;
+    ViewData["Title"] = "Appointments";
+    Layout = "_Layout";
 }
 
-<!DOCTYPE html>
+<h2 class="text-center mb-4">Appointments</h2>
 
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Index</title>
-</head>
-<body>
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-primary">Create New Appointment</a>
 </p>
-<table class="table">
-    <thead>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-dark">
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.AppointmentDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Mentor)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Subject)
-            </th>
-            <th></th>
+            <th>Appointment Date</th>
+            <th>Username</th>
+            <th>Subject Name</th>
+            <th class="text-center">Actions</th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.AppointmentDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Mentor.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Subject.SubjectName)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.AppointmentId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.AppointmentId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.AppointmentId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.AppointmentDate.ToString("g")</td> 
+                <td>@item.MentorUsername</td>
+                <td>@item.SubjectName</td>
+                <td class="text-center">
+                    <a asp-action="Edit" asp-route-id="@item." class="btn btn-sm btn-warning">Edit</a>
+                    <a asp-action="Details" asp-route-id="@item.AppointmentId" class="btn btn-sm btn-info">Details</a>
+                    <a asp-action="Delete" asp-route-id="@item.AppointmentId" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
-</body>
-</html>

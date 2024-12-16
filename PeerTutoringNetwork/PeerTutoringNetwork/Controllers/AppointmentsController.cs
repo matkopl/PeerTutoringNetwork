@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BL.Models;
+using PeerTutoringNetwork.Viewmodels;
 
 namespace PeerTutoringNetwork.Controllers
 {
@@ -21,8 +22,20 @@ namespace PeerTutoringNetwork.Controllers
         // GET: Appointments
         public async Task<IActionResult> Index()
         {
-            var peerTutoringNetworkContext = _context.Appointments.Include(a => a.Mentor).Include(a => a.Subject);
-            return View(await peerTutoringNetworkContext.ToListAsync());
+            var appointments = await _context.Appointments
+                .Include(m => m.Mentor)
+                .Include(s => s.Subject)
+                .Select(a => new AppointmentVM
+                {
+                    MentorId = a.MentorId,
+                    SubjectId = a.SubjectId,
+                    MentorUsername = a.Mentor.Username,
+                    SubjectName = a.Subject.SubjectName,
+                    AppointmentDate = a.AppointmentDate
+                })
+                .ToListAsync();
+
+            return View(appointments);
         }
 
         // GET: Appointments/Details/5
@@ -48,7 +61,7 @@ namespace PeerTutoringNetwork.Controllers
         // GET: Appointments/Create
         public IActionResult Create()
         {
-            ViewData["MentorId"] = new SelectList(_context.Users, "UserId", "Email");
+            ViewData["MentorId"] = new SelectList(_context.Users, "UserId", "Username");
             ViewData["SubjectId"] = new SelectList(_context.Subjects, "SubjectId", "SubjectName");
             return View();
         }
@@ -66,7 +79,7 @@ namespace PeerTutoringNetwork.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["MentorId"] = new SelectList(_context.Users, "UserId", "Email", appointment.MentorId);
+            ViewData["MentorId"] = new SelectList(_context.Users, "UserId", "Username", appointment.MentorId);
             ViewData["SubjectId"] = new SelectList(_context.Subjects, "SubjectId", "SubjectName", appointment.SubjectId);
             return View(appointment);
         }

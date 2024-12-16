@@ -51,6 +51,13 @@ builder.Services.AddDbContext<PeerTutoringNetworkContext>(options => {
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 builder.Services.AddHttpClient();
 
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.CheckConsentNeeded = context => true;
+
+    options.MinimumSameSitePolicy = SameSiteMode.None;
+});
+
 // Configure JWT security services
 var secureKey = builder.Configuration["JWT:SecureKey"];
 builder.Services
@@ -74,6 +81,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCookiePolicy();
 
 app.UseAuthentication();
 

@@ -1,47 +1,45 @@
-﻿@model BL.Models.Appointment
+﻿@model PeerTutoringNetwork.Viewmodels.AppointmentVM
 
 @{
-    Layout = null;
+    Layout = "_Layout";
+    ViewData["Title"] = "Create Appointment";
 }
 
-<!DOCTYPE html>
+<h2 class="text-center mb-4">Create Appointment</h2>
 
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Create</title>
-</head>
-<body>
-
-<h4>Appointment</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
+<div class="row justify-content-center">
+    <div class="col-md-6">
         <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <!-- Mentor Dropdown -->
             <div class="form-group">
-                <label asp-for="MentorId" class="control-label"></label>
-                <select asp-for="MentorId" class ="form-control" asp-items="ViewBag.MentorId"></select>
+                    <label asp-for="MentorId" class="form-label">Mentor</label>
+                    <select asp-for="MentorId" class="form-control" asp-items="ViewBag.MentorId">
+                        <option value="">-- Select Mentor --</option>
+                    </select>
             </div>
+
+            <!-- Subject Dropdown -->
             <div class="form-group">
-                <label asp-for="SubjectId" class="control-label"></label>
-                <select asp-for="SubjectId" class ="form-control" asp-items="ViewBag.SubjectId"></select>
+                <label asp-for="SubjectId" class="form-label">Subject</label>
+                <select asp-for="SubjectId" class="form-control" asp-items="ViewBag.SubjectId">
+                    <option value="">-- Select Subject --</option>
+                </select>
             </div>
+
+            <!-- Appointment Date -->
             <div class="form-group">
-                <label asp-for="AppointmentDate" class="control-label"></label>
-                <input asp-for="AppointmentDate" class="form-control" />
+                <label asp-for="AppointmentDate" class="form-label">Appointment Date</label>
+                <input asp-for="AppointmentDate" class="form-control" placeholder="yyyy-MM-dd hh:mm" />
                 <span asp-validation-for="AppointmentDate" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+
+            <!-- Submit Button -->
+            <div class="form-group text-center mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">Create Appointment</button>
+                <a asp-action="Index" class="btn btn-secondary btn-lg">Back to List</a>
             </div>
         </form>
     </div>
 </div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
-</body>
-</html>

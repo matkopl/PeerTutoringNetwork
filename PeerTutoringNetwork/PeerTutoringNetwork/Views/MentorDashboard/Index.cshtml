@@ -2,13 +2,8 @@
 
 @{
     ViewData["Title"] = "Mentor Dashboard";
+    Layout = "_Layout";
 }
-
-<nav class="mb-4">
-    <a href="/Reservations" class="btn btn-primary">Reservations</a>
-    <a href="/Subjects" class="btn btn-secondary">Subjects</a>
-    <a href="/Appointments" class="btn btn-secondary">Appointments</a>
-</nav>
 
 <h1 class="text-center">Mentor Dashboard</h1>
 
@@ -16,31 +11,30 @@
     <!-- Dashboard Summary -->
     <div class="row mb-4">
         <div class="col-md-6">
-            <div class="card bg-primary text-white">
-                <div class="card-body">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
                     <h4>Total Reservations</h4>
+                </div>
+                <div class="panel-body">
                     <p class="display-4">@Model.TotalReservations</p>
                 </div>
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card bg-success text-white">
-                <div class="card-body">
+            <div class="panel panel-success">
+                <div class="panel-heading">
                     <h4>Total Subjects</h4>
+                </div>
+                <div class="panel-body">
                     <p class="display-4">@Model.TotalSubjects</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <div>
-        <input type="text" id="reservationSearch" 
-            class="form-control mb-3" placeholder="Search reservations...">
-    </div>
-
     <!-- Recent Reservations -->
     <h3>Recent Reservations</h3>
-    <table class="table table-bordered table-striped">
+    <table class="table table-bordered table-hover">
         <thead>
             <tr>
                 <th>Reservation ID</th>
@@ -62,7 +56,7 @@
 
     <!-- Recent Subjects -->
     <h3>Recent Subjects</h3>
-    <table class="table table-bordered table-striped">
+    <table class="table table-bordered table-hover">
         <thead>
             <tr>
                 <th>Subject ID</th>

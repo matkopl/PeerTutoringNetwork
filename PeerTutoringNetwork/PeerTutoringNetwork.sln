@@ -5,7 +5,7 @@ VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PeerTutoringNetwork", "PeerTutoringNetwork\PeerTutoringNetwork.csproj", "{54B6BC80-4495-43C8-9769-7A52FB0E3965}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BL", "BL\BL.csproj", "{53039484-CFA2-4AA6-8EAC-CAA8F615109C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BL", "BL\BL.csproj", "{53039484-CFA2-4AA6-8EAC-CAA8F615109C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
