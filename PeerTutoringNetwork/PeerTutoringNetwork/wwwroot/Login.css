@@ -1,0 +1,100 @@
+﻿/* Globalni reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    background-color: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Glavni container */
+.login-container {
+    background: #ffffff;
+    width: 350px;
+    padding: 20px 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+    /* Naslov */
+    .login-container h2 {
+        margin-bottom: 20px;
+        color: #333333;
+        font-size: 24px;
+    }
+
+    /* Label i input polja */
+    .login-container label {
+        display: block;
+        text-align: left;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #555555;
+    }
+
+    .login-container input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #dddddd;
+        border-radius: 5px;
+        font-size: 16px;
+        outline: none;
+        transition: border-color 0.3s;
+    }
+
+        .login-container input:focus {
+            border-color: #4a90e2;
+        }
+
+    /* Login button */
+    .login-container button {
+        width: 100%;
+        padding: 10px;
+        background-color: #4a90e2;
+        border: none;
+        color: #ffffff;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+        .login-container button:hover {
+            background-color: #357abd;
+        }
+
+ .register-link {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #555555;
+ }
+
+    .register-link a {
+        color: #4a90e2;
+        text-decoration: none;
+        font-weight: bold;
+        transition: color 0.3s;
+    }
+
+        .register-link a:hover {
+            color: #357abd;
+            text-decoration: underline;
+        }
+
+
+/* Responsiveness */
+@media screen and (max-width: 400px) {
+    .login-container {
+        width: 90%;
+    }
+}
