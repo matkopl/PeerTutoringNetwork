@@ -1,45 +1,39 @@
 ﻿@model PeerTutoringNetwork.Viewmodels.AppointmentVM
 
 @{
+    ViewData["Title"] = "Create";
     Layout = "_Layout";
-    ViewData["Title"] = "Create Appointment";
 }
 
-<h2 class="text-center mb-4">Create Appointment</h2>
+<div class="container mt-4">
+    <h2><i class="fas fa-plus-circle"></i> Create Appointment</h2>
+    <hr />
 
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
 
-            <!-- Mentor Dropdown -->
-            <div class="form-group">
-                    <label asp-for="MentorId" class="form-label">Mentor</label>
-                    <select asp-for="MentorId" class="form-control" asp-items="ViewBag.MentorId">
-                        <option value="">-- Select Mentor --</option>
-                    </select>
-            </div>
+        <div class="form-group">
+            <label asp-for="MentorId"><i class="fas fa-user-tie"></i> Mentor</label>
+            <select asp-for="MentorId" class="form-control" asp-items="ViewBag.MentorId"></select>
+        </div>
 
-            <!-- Subject Dropdown -->
-            <div class="form-group">
-                <label asp-for="SubjectId" class="form-label">Subject</label>
-                <select asp-for="SubjectId" class="form-control" asp-items="ViewBag.SubjectId">
-                    <option value="">-- Select Subject --</option>
-                </select>
-            </div>
+        <div class="form-group">
+            <label asp-for="SubjectId"><i class="fas fa-book"></i> Subject</label>
+            <select asp-for="SubjectId" class="form-control" asp-items="ViewBag.SubjectId"></select>
+        </div>
 
-            <!-- Appointment Date -->
-            <div class="form-group">
-                <label asp-for="AppointmentDate" class="form-label">Appointment Date</label>
-                <input asp-for="AppointmentDate" class="form-control" placeholder="yyyy-MM-dd hh:mm" />
-                <span asp-validation-for="AppointmentDate" class="text-danger"></span>
-            </div>
+        <div class="form-group">
+            <label asp-for="AppointmentDate"><i class="fas fa-calendar-alt"></i> Appointment Date</label>
+            <input asp-for="AppointmentDate" class="form-control" type="datetime-local" value="@Model?.AppointmentDate.ToString("yyyy-MM-ddTHH:mm")" />
+        </div>
 
-            <!-- Submit Button -->
-            <div class="form-group text-center mt-4">
-                <button type="submit" class="btn btn-primary btn-lg">Create Appointment</button>
-                <a asp-action="Index" class="btn btn-secondary btn-lg">Back to List</a>
-            </div>
-        </form>
-    </div>
+        <button type="submit" class="btn btn-success">
+            <i class="fas fa-save"></i> Save
+        </button>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    }
 </div>
+

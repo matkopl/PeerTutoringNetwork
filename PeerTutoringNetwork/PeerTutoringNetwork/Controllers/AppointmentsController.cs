@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -23,10 +21,11 @@ namespace PeerTutoringNetwork.Controllers
         public async Task<IActionResult> Index()
         {
             var appointments = await _context.Appointments
-                .Include(m => m.Mentor)
-                .Include(s => s.Subject)
+                .Include(a => a.Mentor)
+                .Include(a => a.Subject)
                 .Select(a => new AppointmentVM
                 {
+                    AppointmentId = a.AppointmentId,
                     MentorId = a.MentorId,
                     SubjectId = a.SubjectId,
                     MentorUsername = a.Mentor.Username,
@@ -38,26 +37,6 @@ namespace PeerTutoringNetwork.Controllers
             return View(appointments);
         }
 
-        // GET: Appointments/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var appointment = await _context.Appointments
-                .Include(a => a.Mentor)
-                .Include(a => a.Subject)
-                .FirstOrDefaultAsync(m => m.AppointmentId == id);
-            if (appointment == null)
-            {
-                return NotFound();
-            }
-
-            return View(appointment);
-        }
-
         // GET: Appointments/Create
         public IActionResult Create()
         {
@@ -67,55 +46,67 @@ namespace PeerTutoringNetwork.Controllers
         }
 
         // POST: Appointments/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AppointmentId,MentorId,SubjectId,AppointmentDate")] Appointment appointment)
+        public async Task<IActionResult> Create([Bind("MentorId,SubjectId,AppointmentDate")] AppointmentVM appointmentVM)
         {
             if (ModelState.IsValid)
             {
+                var appointment = new Appointment
+                {
+                    MentorId = appointmentVM.MentorId,
+                    SubjectId = appointmentVM.SubjectId,
+                    AppointmentDate = appointmentVM.AppointmentDate
+                };
+
                 _context.Add(appointment);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["MentorId"] = new SelectList(_context.Users, "UserId", "Username", appointment.MentorId);
-            ViewData["SubjectId"] = new SelectList(_context.Subjects, "SubjectId", "SubjectName", appointment.SubjectId);
-            return View(appointment);
+
+            ViewData["MentorId"] = new SelectList(_context.Users, "UserId", "Username", appointmentVM.MentorId);
+            ViewData["SubjectId"] = new SelectList(_context.Subjects, "SubjectId", "SubjectName", appointmentVM.SubjectId);
+            return View(appointmentVM);
         }
 
         // GET: Appointments/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var appointment = await _context.Appointments.FindAsync(id);
-            if (appointment == null)
+            if (appointment == null) return NotFound();
+
+            var appointmentVM = new AppointmentVM
             {
-                return NotFound();
-            }
-            ViewData["MentorId"] = new SelectList(_context.Users, "UserId", "Email", appointment.MentorId);
-            ViewData["SubjectId"] = new SelectList(_context.Subjects, "SubjectId", "SubjectName", appointment.SubjectId);
-            return View(appointment);
+                AppointmentId = appointment.AppointmentId,
+                MentorId = appointment.MentorId,
+                SubjectId = appointment.SubjectId,
+                AppointmentDate = appointment.AppointmentDate
+            };
+
+            ViewData["MentorId"] = new SelectList(_context.Users, "UserId", "Username", appointmentVM.MentorId);
+            ViewData["SubjectId"] = new SelectList(_context.Subjects, "SubjectId", "SubjectName", appointmentVM.SubjectId);
+            return View(appointmentVM);
         }
 
         // POST: Appointments/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("AppointmentId,MentorId,SubjectId,AppointmentDate")] Appointment appointment)
+        public async Task<IActionResult> Edit(int id, [Bind("AppointmentId,MentorId,SubjectId,AppointmentDate")] AppointmentVM appointmentVM)
         {
-            if (id != appointment.AppointmentId)
-            {
-                return NotFound();
-            }
+            if (id != appointmentVM.AppointmentId) return NotFound();
 
             if (ModelState.IsValid)
             {
+                var appointment = new Appointment
+                {
+                    AppointmentId = appointmentVM.AppointmentId,
+                    MentorId = appointmentVM.MentorId,
+                    SubjectId = appointmentVM.SubjectId,
+                    AppointmentDate = appointmentVM.AppointmentDate
+                };
+
                 try
                 {
                     _context.Update(appointment);
@@ -123,40 +114,39 @@ namespace PeerTutoringNetwork.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!AppointmentExists(appointment.AppointmentId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    if (!AppointmentExists(appointment.AppointmentId)) return NotFound();
+                    throw;
                 }
+
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["MentorId"] = new SelectList(_context.Users, "UserId", "Email", appointment.MentorId);
-            ViewData["SubjectId"] = new SelectList(_context.Subjects, "SubjectId", "SubjectName", appointment.SubjectId);
-            return View(appointment);
+
+            ViewData["MentorId"] = new SelectList(_context.Users, "UserId", "Username", appointmentVM.MentorId);
+            ViewData["SubjectId"] = new SelectList(_context.Subjects, "SubjectId", "SubjectName", appointmentVM.SubjectId);
+            return View(appointmentVM);
         }
 
         // GET: Appointments/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var appointment = await _context.Appointments
                 .Include(a => a.Mentor)
                 .Include(a => a.Subject)
                 .FirstOrDefaultAsync(m => m.AppointmentId == id);
-            if (appointment == null)
-            {
-                return NotFound();
-            }
 
-            return View(appointment);
+            if (appointment == null) return NotFound();
+
+            var appointmentVM = new AppointmentVM
+            {
+                AppointmentId = appointment.AppointmentId,
+                MentorUsername = appointment.Mentor.Username,
+                SubjectName = appointment.Subject.SubjectName,
+                AppointmentDate = appointment.AppointmentDate
+            };
+
+            return View(appointmentVM);
         }
 
         // POST: Appointments/Delete/5
@@ -168,9 +158,9 @@ namespace PeerTutoringNetwork.Controllers
             if (appointment != null)
             {
                 _context.Appointments.Remove(appointment);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
@@ -178,5 +168,28 @@ namespace PeerTutoringNetwork.Controllers
         {
             return _context.Appointments.Any(e => e.AppointmentId == id);
         }
+
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var appointment = await _context.Appointments
+                .Include(a => a.Mentor)
+                .Include(a => a.Subject)
+                .FirstOrDefaultAsync(m => m.AppointmentId == id);
+
+            if (appointment == null) return NotFound();
+
+            var appointmentVM = new AppointmentVM
+            {
+                AppointmentId = appointment.AppointmentId,
+                MentorUsername = appointment.Mentor.Username,
+                SubjectName = appointment.Subject.SubjectName,
+                AppointmentDate = appointment.AppointmentDate
+            };
+
+            return View(appointmentVM);
+        }
+
     }
 }

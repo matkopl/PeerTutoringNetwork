@@ -7,7 +7,7 @@ public partial class Subject
 {
     public int SubjectId { get; set; }
 
-    public string SubjectName { get; set; } = null!;
+    public string SubjectName { get; set; }
 
     public string? Description { get; set; }
 
@@ -15,7 +15,7 @@ public partial class Subject
 
     public virtual ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
 
-    public virtual User CreatedByUser { get; set; } = null!;
+    public virtual User CreatedByUser { get; set; }
 
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
 }

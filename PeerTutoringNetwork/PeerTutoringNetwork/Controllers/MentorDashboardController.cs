@@ -17,10 +17,10 @@ namespace PeerTutoringNetwork.Controllers
         {
             var dashboardData = new MentorDashboardVM
             {
-                TotalReservations = _context.AppointmentReservations.Count(),
+                TotalAppointments = _context.Appointments.Count(),
                 TotalSubjects = _context.Subjects.Count(),
-                RecentReservations = _context.AppointmentReservations
-                    .OrderByDescending(r => r.ReservationTime)
+                RecentAppointments = _context.Appointments
+                    .OrderByDescending(a => a.AppointmentDate)
                     .Take(5)
                     .ToList(),
                 RecentSubjects = _context.Subjects

@@ -15,7 +15,7 @@ public partial class Appointment
 
     public virtual ICollection<AppointmentReservation> AppointmentReservations { get; set; } = new List<AppointmentReservation>();
 
-    public virtual User Mentor { get; set; } = null!;
+    public virtual User Mentor { get; set; }
 
-    public virtual Subject Subject { get; set; } = null!;
+    public virtual Subject Subject { get; set; }
 }

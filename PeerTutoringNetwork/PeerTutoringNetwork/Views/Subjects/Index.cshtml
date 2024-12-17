@@ -1,48 +1,48 @@
-﻿@model IEnumerable<BL.Models.Subject>
+﻿@model IEnumerable<PeerTutoringNetwork.Viewmodels.SubjectVM>
 
 @{
     ViewData["Title"] = "Index";
     Layout = "_Layout";
 }
 
-<h1>Subjects</h1>
+<div class="container mt-4">
+    <h2><i class="fas fa-book"></i> Subjects</h2>
+    <hr />
+    <p>
+        <a asp-action="Create" class="btn btn-success">
+            <i class="fas fa-plus-circle"></i> Add New Subject
+        </a>
+    </p>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.SubjectName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedByUser)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.SubjectName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedByUser.Username)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.SubjectId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.SubjectId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.SubjectId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Subject Name</th>
+                <th>Description</th>
+                <th>Created By</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var subject in Model)
+            {
+                <tr>
+                    <td>@subject.SubjectName</td>
+                    <td>@subject.Description</td>
+                    <td>@subject.CreatedByUsername</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@subject.SubjectId" class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <a asp-action="Details" asp-route-id="@subject.SubjectId" class="btn btn-info btn-sm">
+                            <i class="fas fa-info-circle"></i> Details
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@subject.SubjectId" class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash-alt"></i> Delete
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

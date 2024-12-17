@@ -5,74 +5,87 @@
     Layout = "_Layout";
 }
 
-<h1 class="text-center">Mentor Dashboard</h1>
+<div class="container mt-4">
+    <div class="text-center mb-4">
+        <h1 class="display-4">
+            <i class="fas fa-tachometer-alt"></i> Mentor Dashboard
+        </h1>
+    </div>
 
-<div class="container">
-    <!-- Dashboard Summary -->
-    <div class="row mb-4">
+    <div class="row text-center mb-4">
         <div class="col-md-6">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h4>Total Reservations</h4>
-                </div>
-                <div class="panel-body">
-                    <p class="display-4">@Model.TotalReservations</p>
+            <div class="card border-primary">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-calendar-check"></i> Total Appointments
+                    </h5>
+                    <p class="display-4">@Model.TotalAppointments</p>
                 </div>
             </div>
         </div>
         <div class="col-md-6">
-            <div class="panel panel-success">
-                <div class="panel-heading">
-                    <h4>Total Subjects</h4>
-                </div>
-                <div class="panel-body">
+            <div class="card border-success">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-book"></i> Total Subjects
+                    </h5>
                     <p class="display-4">@Model.TotalSubjects</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Recent Reservations -->
-    <h3>Recent Reservations</h3>
-    <table class="table table-bordered table-hover">
-        <thead>
-            <tr>
-                <th>Reservation ID</th>
-                <th>Student</th>
-                <th>Time</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var reservation in Model.RecentReservations)
-            {
-                <tr>
-                    <td>@reservation.ReservationId</td>
-                    <td>@reservation.StudentId</td>
-                    <td>@reservation.ReservationTime.ToString()</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <hr class="my-4" />
 
-    <!-- Recent Subjects -->
-    <h3>Recent Subjects</h3>
-    <table class="table table-bordered table-hover">
-        <thead>
-            <tr>
-                <th>Subject ID</th>
-                <th>Name</th>
-                <th>Description</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var subject in Model.RecentSubjects)
-            {
+    <div class="mb-4">
+        <h3 class="mb-3">
+            <i class="fas fa-clipboard-list"></i> Recent Appointments
+        </h3>
+        <table class="table table-bordered table-hover">
+            <thead class="thead-light">
                 <tr>
-                    <td>@subject.SubjectId</td>
-                    <td>@subject.SubjectName</td>
-                    <td>@subject.Description</td>
+                    <th><i class="fas fa-id-badge"></i> Appointment ID</th>
+                    <th><i class="fas fa-user-tie"></i> Mentor</th>
+                    <th><i class="fas fa-clock"></i> Date & Time</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var appointment in Model.RecentAppointments)
+                {
+                    <tr>
+                        <td>@appointment.AppointmentId</td>
+                        <td>@appointment.Mentor</td>
+                        <td>@appointment.AppointmentDate.ToString("yyyy-MM-dd HH:mm")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <hr class="my-4" />
+
+    <div>
+        <h3 class="mb-3">
+            <i class="fas fa-book-open"></i> Recent Subjects
+        </h3>
+        <table class="table table-bordered table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th><i class="fas fa-hashtag"></i> Subject ID</th>
+                    <th><i class="fas fa-font"></i> Name</th>
+                    <th><i class="fas fa-align-left"></i> Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var subject in Model.RecentSubjects)
+                {
+                    <tr>
+                        <td>@subject.SubjectId</td>
+                        <td>@subject.SubjectName</td>
+                        <td>@subject.Description</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>

@@ -1,38 +1,49 @@
 ﻿@model IEnumerable<PeerTutoringNetwork.Viewmodels.AppointmentVM>
 
+
 @{
     ViewData["Title"] = "Appointments";
     Layout = "_Layout";
 }
 
-<h2 class="text-center mb-4">Appointments</h2>
+<div class="container mt-4">
+    <h2><i class="fas fa-calendar-alt"></i> Appointments</h2>
+    <hr />
+    <p>
+        <a asp-action="Create" class="btn btn-success">
+            <i class="fas fa-plus-circle"></i> Create New Appointment
+        </a>
+    </p>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Create New Appointment</a>
-</p>
-
-<table class="table table-bordered table-hover">
-    <thead class="table-dark">
-        <tr>
-            <th>Appointment Date</th>
-            <th>Username</th>
-            <th>Subject Name</th>
-            <th class="text-center">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+    <table class="table table-bordered table-striped">
+        <thead>
             <tr>
-                <td>@item.AppointmentDate.ToString("g")</td> 
-                <td>@item.MentorUsername</td>
-                <td>@item.SubjectName</td>
-                <td class="text-center">
-                    <a asp-action="Edit" asp-route-id="@item." class="btn btn-sm btn-warning">Edit</a>
-                    <a asp-action="Details" asp-route-id="@item.AppointmentId" class="btn btn-sm btn-info">Details</a>
-                    <a asp-action="Delete" asp-route-id="@item.AppointmentId" class="btn btn-sm btn-danger">Delete</a>
-                </td>
+                <th>Mentor</th>
+                <th>Subject</th>
+                <th>Appointment Date</th>
+                <th>Actions</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.MentorUsername</td>
+                    <td>@item.SubjectName</td>
+                    <td>@item.AppointmentDate.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.AppointmentId" class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <a asp-action="Details" asp-route-id="@item.AppointmentId" class="btn btn-info btn-sm">
+                            <i class="fas fa-info-circle"></i> Details
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@item.AppointmentId" class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash-alt"></i> Delete
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

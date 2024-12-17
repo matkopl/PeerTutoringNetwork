@@ -1,45 +1,31 @@
-﻿@model BL.Models.Appointment
+﻿@model PeerTutoringNetwork.Viewmodels.AppointmentVM
 
 @{
+    ViewData["Title"] = "Appointment details";
     Layout = "_Layout";
 }
 
-<!DOCTYPE html>
-
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Details</title>
-</head>
-<body>
-
-<div>
-    <h4>Appointment</h4>
+<div class="container mt-4">
+    <h2><i class="fas fa-info-circle"></i> Appointment Details</h2>
     <hr />
+
     <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.AppointmentDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.AppointmentDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Mentor)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Mentor.Email)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Subject)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Subject.SubjectName)
-        </dd>
+        <dt class="col-sm-4"><i class="fas fa-user-tie"></i> Mentor</dt>
+        <dd class="col-sm-8">@Model.MentorUsername</dd>
+
+        <dt class="col-sm-4"><i class="fas fa-book"></i> Subject</dt>
+        <dd class="col-sm-8">@Model.SubjectName</dd>
+
+        <dt class="col-sm-4"><i class="fas fa-calendar-alt"></i> Appointment Date</dt>
+        <dd class="col-sm-8">@Model.AppointmentDate.ToString("yyyy-MM-dd HH:mm")</dd>
     </dl>
+
+    <div class="mt-3">
+        <a asp-action="Edit" asp-route-id="@Model.AppointmentId" class="btn btn-warning">
+            <i class="fas fa-edit"></i> Edit
+        </a>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.AppointmentId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
-</body>
-</html>
