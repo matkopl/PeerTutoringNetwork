@@ -1,0 +1,25 @@
+@model System.Collections.Generic.List<PeerTutoringNetwork.Viewmodels.AppointmentVM>
+
+@{
+    ViewBag.Title = "Session calendar";
+    Layout = "_Layout";
+}
+
+<head>
+    <link rel="stylesheet" href="./Calendar.css" />
+</head>
+
+<h2>My calendar</h2>
+<div id="calendar"></div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js"></script>
+<script src="./Calendar.js"></script>
+<script>
+    var data = [
+        @foreach (var appointment in Model)
+        {
+            @: { eventName: '@appointment.SubjectName session at @appointment.AppointmentDate.ToString("HH:mm") with @appointment.MentorUsername', calendar: 'Work', color: 'blue' },
+        }
+    ];
+
+    var calendar = new Calendar('#calendar', data);
+</script>

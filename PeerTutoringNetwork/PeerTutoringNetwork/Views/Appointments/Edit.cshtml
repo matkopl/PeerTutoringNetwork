@@ -5,10 +5,10 @@
 }
 
 <div class="container mt-4">
-    <h2><i class="fas fa-edit"></i> Edit Appointment</h2>
+    <h2><i class="fas fa-edit"></i> EditAction Appointment</h2>
     <hr />
 
-    <form asp-action="Edit" method="post">
+    <form asp-action="EditAction">
         @Html.AntiForgeryToken()
         @Html.HiddenFor(model => model.AppointmentId)
 
@@ -24,15 +24,18 @@
 
         <div class="form-group">
             <label asp-for="AppointmentDate"><i class="fas fa-calendar-alt"></i> Appointment Date</label>
-            <input asp-for="AppointmentDate" class="form-control" type="datetime-local" />
+            <input asp-for="AppointmentDate" class="form-control" type="datetime-local"/>
         </div>
 
         <div class="mt-3">
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to List
+            </a>
             <button type="submit" class="btn btn-warning">
                 <i class="fas fa-save"></i> Save Changes
             </button>
-            <a asp-action="Index" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to List
+            <a type="button" class="btn btn-danger" href="@Url.ActionLink("DeleteAction", "Appointment", new {id = Model.AppointmentId})">
+                <i class="fas fa-save"></i> Delete
             </a>
         </div>
     </form>

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BL.Models;
+using BL.Services;
 using PeerTutoringNetwork.Viewmodels;
 
 namespace PeerTutoringNetwork.Controllers
@@ -11,94 +12,83 @@ namespace PeerTutoringNetwork.Controllers
     public class AppointmentsController : Controller
     {
         private readonly PeerTutoringNetworkContext _context;
+        private readonly IAppointmentService _appointmentService;
 
-        public AppointmentsController(PeerTutoringNetworkContext context)
+        public AppointmentsController(PeerTutoringNetworkContext context, IAppointmentService appointmentService)
         {
             _context = context;
+            _appointmentService = appointmentService;
         }
 
-        // GET: Appointments
         public async Task<IActionResult> Index()
         {
-            var appointments = await _context.Appointments
-                .Include(a => a.Mentor)
-                .Include(a => a.Subject)
-                .Select(a => new AppointmentVM
-                {
-                    AppointmentId = a.AppointmentId,
-                    MentorId = a.MentorId,
-                    SubjectId = a.SubjectId,
-                    MentorUsername = a.Mentor.Username,
-                    SubjectName = a.Subject.SubjectName,
-                    AppointmentDate = a.AppointmentDate
-                })
-                .ToListAsync();
+            var appointments = await _appointmentService.GetAppointments();
+            var appointmentVms = appointments.Select(a => new AppointmentVM
+            {
+                AppointmentId = a.AppointmentId,
+                MentorId = a.MentorId,
+                SubjectId = a.SubjectId,
+                MentorUsername = a.Mentor.Username,
+                SubjectName = a.Subject.SubjectName,
+                AppointmentDate = a.AppointmentDate
+            });
 
-            return View(appointments);
+            return View(appointmentVms);
         }
 
-        // GET: Appointments/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            // TODO select all mentors and all subjects
             ViewData["MentorId"] = new SelectList(_context.Users, "UserId", "Username");
             ViewData["SubjectId"] = new SelectList(_context.Subjects, "SubjectId", "SubjectName");
             return View();
         }
 
-        // POST: Appointments/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("MentorId,SubjectId,AppointmentDate")] AppointmentVM appointmentVM)
+        public async Task<IActionResult> CreateAction(AppointmentVM appointmentVM)
         {
-            if (ModelState.IsValid)
+            var appointment = new Appointment
             {
-                var appointment = new Appointment
-                {
-                    MentorId = appointmentVM.MentorId,
-                    SubjectId = appointmentVM.SubjectId,
-                    AppointmentDate = appointmentVM.AppointmentDate
-                };
-
-                _context.Add(appointment);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-
-            ViewData["MentorId"] = new SelectList(_context.Users, "UserId", "Username", appointmentVM.MentorId);
-            ViewData["SubjectId"] = new SelectList(_context.Subjects, "SubjectId", "SubjectName", appointmentVM.SubjectId);
-            return View(appointmentVM);
-        }
-
-        // GET: Appointments/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null) return NotFound();
-
-            var appointment = await _context.Appointments.FindAsync(id);
-            if (appointment == null) return NotFound();
-
-            var appointmentVM = new AppointmentVM
-            {
-                AppointmentId = appointment.AppointmentId,
-                MentorId = appointment.MentorId,
-                SubjectId = appointment.SubjectId,
-                AppointmentDate = appointment.AppointmentDate
+                MentorId = appointmentVM.MentorId,
+                SubjectId = appointmentVM.SubjectId,
+                AppointmentDate = appointmentVM.AppointmentDate
             };
 
-            ViewData["MentorId"] = new SelectList(_context.Users, "UserId", "Username", appointmentVM.MentorId);
-            ViewData["SubjectId"] = new SelectList(_context.Subjects, "SubjectId", "SubjectName", appointmentVM.SubjectId);
-            return View(appointmentVM);
+            await _appointmentService.CreateAppointment(appointment);
+            return RedirectToAction(nameof(Index));
         }
 
-        // POST: Appointments/Edit/5
+        // GET: Appointments/EditAction/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null) return BadRequest("id is required");
+            // TODO select all mentors and all subjects
+            try
+            {
+                var appointment = await  _appointmentService.GetAppointment(id.Value);
+                var appointmentVM = new AppointmentVM
+                {
+                    AppointmentId = appointment.AppointmentId,
+                    MentorId = appointment.MentorId,
+                    SubjectId = appointment.SubjectId,
+                    AppointmentDate = appointment.AppointmentDate
+                };
+                ViewData["MentorId"] = new SelectList(_context.Users, "UserId", "Username", appointmentVM.MentorId);
+                ViewData["SubjectId"] =
+                    new SelectList(_context.Subjects, "SubjectId", "SubjectName", appointmentVM.SubjectId);
+
+                return View(appointmentVM);
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
+        }
+
+        // POST: Appointments/EditAction/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("AppointmentId,MentorId,SubjectId,AppointmentDate")] AppointmentVM appointmentVM)
+        public async Task<IActionResult> EditAction(AppointmentVM appointmentVM)
         {
-            if (id != appointmentVM.AppointmentId) return NotFound();
-
-            if (ModelState.IsValid)
-            {
                 var appointment = new Appointment
                 {
                     AppointmentId = appointmentVM.AppointmentId,
@@ -106,90 +96,80 @@ namespace PeerTutoringNetwork.Controllers
                     SubjectId = appointmentVM.SubjectId,
                     AppointmentDate = appointmentVM.AppointmentDate
                 };
-
                 try
                 {
-                    _context.Update(appointment);
-                    await _context.SaveChangesAsync();
+                    await _appointmentService.UpdateAppointment(appointment.AppointmentId, appointment);
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (Exception e)
                 {
-                    if (!AppointmentExists(appointment.AppointmentId)) return NotFound();
+                    Console.WriteLine(e);
                     throw;
                 }
 
                 return RedirectToAction(nameof(Index));
-            }
-
-            ViewData["MentorId"] = new SelectList(_context.Users, "UserId", "Username", appointmentVM.MentorId);
-            ViewData["SubjectId"] = new SelectList(_context.Subjects, "SubjectId", "SubjectName", appointmentVM.SubjectId);
-            return View(appointmentVM);
         }
 
-        // GET: Appointments/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null) return NotFound();
-
-            var appointment = await _context.Appointments
-                .Include(a => a.Mentor)
-                .Include(a => a.Subject)
-                .FirstOrDefaultAsync(m => m.AppointmentId == id);
-
-            if (appointment == null) return NotFound();
-
-            var appointmentVM = new AppointmentVM
-            {
-                AppointmentId = appointment.AppointmentId,
-                MentorUsername = appointment.Mentor.Username,
-                SubjectName = appointment.Subject.SubjectName,
-                AppointmentDate = appointment.AppointmentDate
-            };
-
-            return View(appointmentVM);
-        }
-
-        // POST: Appointments/Delete/5
-        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteAction(int id)
         {
-            var appointment = await _context.Appointments.FindAsync(id);
-            if (appointment != null)
+            try
             {
-                _context.Appointments.Remove(appointment);
-                await _context.SaveChangesAsync();
+                await _appointmentService.DeleteAppointment(id);
+            }
+            catch (Exception)
+            {
+                return NotFound();
             }
 
             return RedirectToAction(nameof(Index));
         }
 
-        private bool AppointmentExists(int id)
-        {
-            return _context.Appointments.Any(e => e.AppointmentId == id);
-        }
 
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null) return NotFound();
-
-            var appointment = await _context.Appointments
-                .Include(a => a.Mentor)
-                .Include(a => a.Subject)
-                .FirstOrDefaultAsync(m => m.AppointmentId == id);
-
-            if (appointment == null) return NotFound();
-
-            var appointmentVM = new AppointmentVM
+            if (id == null) return BadRequest("Id is required");
+            try
             {
-                AppointmentId = appointment.AppointmentId,
-                MentorUsername = appointment.Mentor.Username,
-                SubjectName = appointment.Subject.SubjectName,
-                AppointmentDate = appointment.AppointmentDate
-            };
-
-            return View(appointmentVM);
+                var appointment = await _appointmentService.GetAppointment(id.Value);
+                var appointmentVM = new AppointmentVM
+                {
+                    AppointmentId = appointment.AppointmentId,
+                    MentorUsername = appointment.Mentor.Username,
+                    SubjectName = appointment.Subject.SubjectName,
+                    AppointmentDate = appointment.AppointmentDate
+                };
+                return View(appointmentVM);
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
         }
 
+        public IActionResult Calendar()
+        {
+            //TODO need to figure out what is the current user
+            return View(new List<AppointmentVM>()
+            {
+                new AppointmentVM()
+                {
+                    MentorUsername = "Mentor Mock",
+                    SubjectName = "Subject Mock",
+                    AppointmentDate = DateTime.Now + TimeSpan.FromDays(1)
+                },
+                new AppointmentVM()
+                {
+                    MentorUsername = "Mentor Mock",
+                    SubjectName = "Subject Mock",
+                    AppointmentDate = DateTime.Now + TimeSpan.FromDays(4)
+                },
+                new AppointmentVM()
+                {
+                    MentorUsername = "Mentor Mock",
+                    SubjectName = "Subject Mock",
+                    AppointmentDate = DateTime.Now + TimeSpan.FromDays(-5)
+                }
+            });
+        }
     }
 }

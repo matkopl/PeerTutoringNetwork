@@ -1,10 +1,10 @@
 ﻿@model BL.Models.User
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "EditAction";
 }
 
-<h1>Edit</h1>
+<h1>EditAction</h1>
 
 <h4>User</h4>
 <hr />
@@ -65,5 +65,5 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

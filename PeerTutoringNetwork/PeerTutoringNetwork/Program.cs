@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using BL.Models;
+using BL.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +51,9 @@ builder.Services.AddDbContext<PeerTutoringNetworkContext>(options => {
 });
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 builder.Services.AddHttpClient();
+
+builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {

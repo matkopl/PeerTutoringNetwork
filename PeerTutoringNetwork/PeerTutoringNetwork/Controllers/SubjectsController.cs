@@ -63,7 +63,7 @@ namespace PeerTutoringNetwork.Controllers
             return View(subjectVM);
         }
 
-        // GET: Subjects/Edit/5
+        // GET: Subjects/EditAction/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -83,7 +83,7 @@ namespace PeerTutoringNetwork.Controllers
             return View(subjectVM);
         }
 
-        // POST: Subjects/Edit/5
+        // POST: Subjects/EditAction/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("SubjectId,SubjectName,Description,CreatedByUserId")] SubjectVM subjectVM)

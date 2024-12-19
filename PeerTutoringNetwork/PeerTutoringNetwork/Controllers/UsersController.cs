@@ -72,7 +72,7 @@ namespace PeerTutoringNetwork.Controllers
             return View(user);
         }
 
-        // GET: Users/Edit/5
+        // GET: Users/EditAction/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -89,7 +89,7 @@ namespace PeerTutoringNetwork.Controllers
             return View(user);
         }
 
-        // POST: Users/Edit/5
+        // POST: Users/EditAction/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
