@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="Profile.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <span class="greeting">Pozdrav, <span id="username-navbar"></span>!</span>
+        <button id="logout-button" onclick="logout()">Logout</button>
+    </nav>
+
+    <!-- Profile Content -->
+    <div class="profile-container">
+        <h2>User Profile</h2>
+        <form id="profileForm" onsubmit="updateProfile(event)">
+            <div class="profile-section">
+                <!-- Display user details -->
+                <label for="username"><b>Username:</b></label>
+                <input type="text" id="username" name="username" disabled>
+
+                <label for="firstName"><b>First Name:</b></label>
+                <input type="text" id="firstName" name="firstName" placeholder="Enter your first name">
+
+                <label for="lastName"><b>Last Name:</b></label>
+                <input type="text" id="lastName" name="lastName" placeholder="Enter your last name">
+
+                <label for="email"><b>Email:</b></label>
+                <input type="email" id="email" name="email" placeholder="Enter your email">
+
+                <label for="phone"><b>Phone:</b></label>
+                <input type="text" id="phone" name="phone" placeholder="Enter your phone number">
+            </div>
+
+            <div class="profile-actions">
+                <!-- Save changes -->
+                <button type="submit" id="save-button">Save Changes</button>
+                <!-- Clear optional data -->
+                <button type="button" id="clear-button" onclick="clearOptionalData()">Clear Optional Data</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="Profile.js"></script>
+</body>
+</html>
