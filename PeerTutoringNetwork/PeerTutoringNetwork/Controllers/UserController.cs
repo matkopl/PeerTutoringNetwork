@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PeerTutoringNetwork.DTO;
 using PeerTutoringNetwork.DTOs;
 using PeerTutoringNetwork.Security;
 
@@ -119,84 +118,6 @@ namespace PeerTutoringNetwork.Controllers
 
                 // Vrati token
                 return Ok(serializedToken);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-        [HttpGet("[action]")]
-        public ActionResult GetProfile(int userId)
-        {
-            try
-            {
-                var user = _context.Users
-                    .Select(u => new UserProfileDto
-                    {
-                        UserId = u.UserId,
-                        FirstName = u.FirstName,
-                        LastName = u.LastName,
-                        Email = u.Email,
-                        Phone = u.Phone,
-                        Username = u.Username,
-                        RoleId = u.RoleId
-                    })
-                    .FirstOrDefault(u => u.UserId == userId);
-
-                if (user == null)
-                    return NotFound("User not found");
-
-                return Ok(user);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-        [HttpPut("[action]")]
-        public ActionResult UpdateProfile(UserProfileUpdateDto updateDto)
-        {
-            try
-            {
-                var user = _context.Users.FirstOrDefault(u => u.UserId == updateDto.UserId);
-
-                if (user == null)
-                    return NotFound("User not found");
-
-                // Ažuriranje podataka
-                user.FirstName = updateDto.FirstName ?? user.FirstName;
-                user.LastName = updateDto.LastName ?? user.LastName;
-                user.Email = updateDto.Email ?? user.Email;
-                user.Phone = updateDto.Phone ?? user.Phone;
-
-                _context.SaveChanges();
-
-                return Ok("Profile updated successfully");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-        [HttpDelete("[action]")]
-        public ActionResult ClearOptionalData(int userId)
-        {
-            try
-            {
-                var user = _context.Users.FirstOrDefault(u => u.UserId == userId);
-
-                if (user == null)
-                    return NotFound("User not found");
-
-                // Brisanje neobaveznih podataka
-                user.Phone = null;
-                user.Email = null;
-
-                _context.SaveChanges();
-
-                return Ok("Optional data cleared successfully");
             }
             catch (Exception ex)
             {

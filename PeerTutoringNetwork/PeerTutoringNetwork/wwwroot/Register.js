@@ -17,8 +17,8 @@
     }).done(function (tokenData) {
         console.log(tokenData);
 
-        alert("Succesful registration.")
-        window.location.href = "Login.html";
+        // Do login after registration
+       
     }).fail(function (err) {
         alert(err.responseText);
 
