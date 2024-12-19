@@ -101,15 +101,14 @@ namespace PeerTutoringNetwork.Controllers
 
                 // Pretvori `PwdSalt` iz baze (byte[]) natrag u Base64 string
                 var saltBase64 = Convert.ToBase64String(existingUser.PwdSalt);
-                Console.WriteLine($"[Login] Retrieved Salt (Base64) from DB: {saltBase64}");
 
                 // Generiraj hash unesenog passworda koristeći isti salt
                 var computedHashBase64 = PasswordHashProvider.GetHash(loginDto.Password, saltBase64);
-                Console.WriteLine($"[Login] Computed Hash (Base64) for input password: {computedHashBase64}");
+                Console.WriteLine($"[Login](Base64) for input password:-------------- {(computedHashBase64)}");
 
                 // Pretvori spremljeni hash iz baze (byte[]) u Base64 string
                 var storedHashBase64 = Convert.ToBase64String(existingUser.PwdHash);
-                Console.WriteLine($"[Login] Retrieved Hash (Base64) from DB: {storedHashBase64}");
+                Console.WriteLine($"[Login](Base64) from DB:------------- {storedHashBase64}");
 
 
                 // Usporedi hash-eve

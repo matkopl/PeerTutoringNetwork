@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link href="Register.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="register-container">
+        <h2>Register</h2>
+
+        <input type="hidden" id="id" name="id">
+
+        <label for="firstName"><b>First Name</b></label>
+        <input type="text" placeholder="Enter First Name" name="firstName" id="firstName" required>
+
+        <label for="lastName"><b>Last Name</b></label>
+        <input type="text" placeholder="Enter Last Name" name="lastName" id="lastName" required>
+
+        <label for="email"><b>E-mail</b></label>
+        <input type="text" placeholder="Enter E-mail" name="email" id="email" required>
+
+        <label for="phone"><b>Phone Number</b></label>
+        <input type="text" placeholder="Enter Phone Number" name="phone" id="phone" required>
+
+        <label for="username"><b>Username</b></label>
+        <input type="text" placeholder="Enter Username" name="username" id="username" required>
+
+        <!-- Role -->
+        <label for="roleId"><b>Role</b></label>
+        <select id="roleId" name="roleId" required>
+            <option value="" disabled selected>Select a role</option>
+            <option value="1">Student</option>
+            <option value="2">Mentor</option>
+            <option value="3">Admin</option>
+        </select>
+
+        <!-- Password -->
+        <label for="password"><b>Password</b></label>
+        <input type="password" placeholder="Enter Password" name="password" id="password" required>
+
+        <!-- Submit Button -->
+        <button id="register-button" onclick="register()">Register <span id="spinner-placeholder"></span></button>
+
+        <!-- Already have an account? -->
+        <p class="redirect-text">
+            Already have an account?
+            <a href="Login.html">Login here</a>
+        </p>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous"></script>
+    <script src="Register.js"></script>
+</body>
+</html>
