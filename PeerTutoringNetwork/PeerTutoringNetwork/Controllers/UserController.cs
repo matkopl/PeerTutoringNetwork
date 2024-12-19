@@ -125,7 +125,6 @@ namespace PeerTutoringNetwork.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-
         [HttpGet("[action]")]
         public ActionResult GetProfile(int userId)
         {
@@ -204,6 +203,8 @@ namespace PeerTutoringNetwork.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
+
 
     }
 }

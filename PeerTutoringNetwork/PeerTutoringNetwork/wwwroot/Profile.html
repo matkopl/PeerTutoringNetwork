@@ -3,15 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Profile</title>
+    <title>Profile</title>
     <link rel="stylesheet" href="Profile.css">
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <span class="greeting">Pozdrav, <span id="username-navbar"></span>!</span>
-        <button id="logout-button" onclick="logout()">Logout</button>
-    </nav>
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="logo">Peer Tutoring</div>
+        <div class="nav-links">
+            <a href="MentorDashboard/index">Home</a>
+            <a href="Login.html" class="logout">Logout</a>
+        </div>
+    </div>
 
     <!-- Profile Content -->
     <div class="profile-container">
