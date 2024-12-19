@@ -14,9 +14,9 @@
         localStorage.setItem("JWT", tokenData);
 
         // redirect
-        window.location.href = "MentorDashboard/Index";
+        window.location.href = "Profile.html";
     }).fail(function (err) {
-        alert(err.responseText);
+        alert(err.responseText("Username or password is incorect."));
         localStorage.removeItem("JWT");
     });
 }
