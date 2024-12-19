@@ -14,8 +14,8 @@ CREATE TABLE Roles (
 CREATE TABLE Users (
     user_id INT IDENTITY(1,1) PRIMARY KEY,
     username NVARCHAR(50) NOT NULL UNIQUE,
-    pwd_hash BINARY(256) NOT NULL,
-    pwd_salt BINARY(256) NOT NULL,
+    pwd_hash VARBINARY(32) NOT NULL,
+    pwd_salt VARBINARY(16) NOT NULL,
     first_name NVARCHAR(256) NOT NULL,
     last_name NVARCHAR(256) NOT NULL,
     email NVARCHAR(256) NOT NULL UNIQUE,

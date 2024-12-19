@@ -89,36 +89,34 @@ namespace PeerTutoringNetwork.Controllers
         {
             try
             {
-                // Jasne poruke za neuspješne pokušaje
                 var genericLoginFail = "Incorrect username or password";
-                var usernameFail = "Username does not exist";
-                var passwordFail = "Incorrect password";
 
-                // Dohvati korisnika iz baze prema korisničkom imenu
-                var existingUser = _context.Users.FirstOrDefault(x => x.Username == loginDto.Username);
+                // Trim korisničkog imena za sigurnost
+                var trimmedUsername = loginDto.Username.Trim();
+
+                // Dohvati korisnika prema obrezanom korisničkom imenu
+                var existingUser = _context.Users.FirstOrDefault(x => x.Username == trimmedUsername);
                 if (existingUser == null)
-                    return Unauthorized(usernameFail);
+                    return Unauthorized("Username does not exist");
 
-                // Pretvori `PwdSalt` iz baze (byte[]) natrag u Base64 string
+                // Pretvori salt iz baze (byte[] u Base64 string)
                 var saltBase64 = Convert.ToBase64String(existingUser.PwdSalt);
 
-                // Generiraj hash unesenog passworda koristeći isti salt
+                // Generiraj hash unesenog passworda koristeći salt iz baze
                 var computedHashBase64 = PasswordHashProvider.GetHash(loginDto.Password, saltBase64);
-                Console.WriteLine($"[Login](Base64) for input password:-------------- {(computedHashBase64)}");
 
-                // Pretvori spremljeni hash iz baze (byte[]) u Base64 string
+                // Dohvati spremljeni hash iz baze u Base64 formatu
                 var storedHashBase64 = Convert.ToBase64String(existingUser.PwdHash);
-                Console.WriteLine($"[Login](Base64) from DB:------------- {storedHashBase64}");
 
-
-                // Usporedi hash-eve
+                // Usporedi generirani hash sa spremljenim hashom
                 if (computedHashBase64 != storedHashBase64)
-                    return Unauthorized(passwordFail);
+                    return Unauthorized("Incorrect password");
 
-                // Kreiraj i vrati JWT token
+                // Kreiraj JWT token
                 var secureKey = _configuration["JWT:SecureKey"];
-                var serializedToken = JwtTokenProvider.CreateToken(secureKey, 60, loginDto.Username);
+                var serializedToken = JwtTokenProvider.CreateToken(secureKey, 60, trimmedUsername);
 
+                // Vrati token
                 return Ok(serializedToken);
             }
             catch (Exception ex)
@@ -126,6 +124,7 @@ namespace PeerTutoringNetwork.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
 
 
     }

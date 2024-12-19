@@ -14,7 +14,7 @@
         localStorage.setItem("JWT", tokenData);
 
         // redirect
-        window.location.href = "Views/MentorDashboard/Index.cshtml";
+        window.location.href = "MentorDashboard/Index";
     }).fail(function (err) {
         alert(err.responseText);
         localStorage.removeItem("JWT");
