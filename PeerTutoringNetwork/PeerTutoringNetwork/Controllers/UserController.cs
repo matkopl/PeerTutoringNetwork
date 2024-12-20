@@ -26,8 +26,7 @@ namespace PeerTutoringNetwork.Controllers
         {
             try
             {
-                // The same secure key must be used here to create JWT,
-                // as the one that is used by middleware to verify JWT
+             
                 var secureKey = _configuration["JWT:SecureKey"];
                 var serializedToken = JwtTokenProvider.CreateToken(secureKey, 10);
 
@@ -49,19 +48,19 @@ namespace PeerTutoringNetwork.Controllers
                     return BadRequest($"Username {trimmedUsername} already exists");
 
                 // Hashiranje i generiranje salt-a pri registraciji
-                var b64salt = PasswordHashProvider.GetSalt(); // Ovo je već u Base64 string formatu
-                var b64hash = PasswordHashProvider.GetHash(registerDto.Password, b64salt); // Također vraća Base64 hash
+                var b64salt = PasswordHashProvider.GetSalt(); 
+                var b64hash = PasswordHashProvider.GetHash(registerDto.Password, b64salt); 
 
                 Console.WriteLine($"Salt (Base64): {b64salt}");
                 Console.WriteLine($"Hash (Base64): {b64hash}");
 
-                // Pohranjujemo u bazi kao byte[], zato ih konvertujemo:
+                
                 var user = new User
                 {
                     UserId = registerDto.Id,
                     Username = registerDto.Username,
-                    PwdHash = Convert.FromBase64String(b64hash), // Konvertiramo hash u byte[]
-                    PwdSalt = Convert.FromBase64String(b64salt), // Konvertiramo salt u byte[]
+                    PwdHash = Convert.FromBase64String(b64hash), 
+                    PwdSalt = Convert.FromBase64String(b64salt), 
                     FirstName = registerDto.FirstName,
                     LastName = registerDto.LastName,
                     Email = registerDto.Email,
@@ -69,11 +68,11 @@ namespace PeerTutoringNetwork.Controllers
                     RoleId = registerDto.RoleId
                 };
 
-                // Dodavanje korisnika u bazu
+                
                 _context.Add(user);
                 _context.SaveChanges();
 
-                // Update DTO Id to return it to the client
+               
                 registerDto.Id = user.UserId;
 
                 return Ok(registerDto);

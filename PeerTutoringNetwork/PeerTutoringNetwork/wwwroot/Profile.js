@@ -1,4 +1,4 @@
-﻿const userId = 1; // Pretpostavljamo da imamo userId iz sesije ili tokena
+﻿const userId = 1; 
 
 // Funkcija za dohvaćanje profila i popunjavanje podataka
 function fetchProfile() {
@@ -20,12 +20,12 @@ function fetchProfile() {
 
 // Logout funkcija
 function logout() {
-    // Ovde možete dodati brisanje tokena iz localStorage-a ili cookie-a
+    
     alert('Successfully logged out!');
-    window.location.href = '/Login.html'; // Preusmeravanje na login stranicu
+    window.location.href = '/Login.html'; 
 }
 
-// Funkcija za ažuriranje profila (ostaje ista)
+// Funkcija za ažuriranje profila 
 function updateProfile(event) {
     event.preventDefault();
 
@@ -49,7 +49,7 @@ function updateProfile(event) {
         .catch(error => console.error('Error updating profile:', error));
 }
 
-// Funkcija za brisanje neobaveznih podataka (ostaje ista)
+// Funkcija za brisanje neobaveznih podataka 
 function clearOptionalData() {
     fetch(`/api/User/ClearOptionalData?userId=${userId}`, {
         method: 'DELETE'
