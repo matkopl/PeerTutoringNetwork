@@ -16,7 +16,7 @@
         // redirect
         window.location.href = "Profile.html";
     }).fail(function (err) {
-        alert(err.responseText("Username or password is incorect."));
+        alert("Username or password is incorect.");
         localStorage.removeItem("JWT");
     });
 }

@@ -114,7 +114,7 @@ namespace PeerTutoringNetwork.Controllers
 
                 // Kreiraj JWT token
                 var secureKey = _configuration["JWT:SecureKey"];
-                var serializedToken = JwtTokenProvider.CreateToken(secureKey, 60, trimmedUsername);
+                var serializedToken = JwtTokenProvider.CreateToken(secureKey, 60, trimmedUsername, existingUser.UserId.ToString());
 
                 // Vrati token
                 return Ok(serializedToken);
