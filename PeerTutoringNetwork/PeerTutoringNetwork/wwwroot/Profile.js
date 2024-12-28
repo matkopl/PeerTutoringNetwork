@@ -1,4 +1,25 @@
-﻿const userId = 1; 
+﻿import jwt_decode from 'jwt-decode';
+
+function getUserInfoFromToken(token) {
+    try {
+        const decoded = jwt_decode(token);
+        const userId = decoded.userId;
+        const roleId = decoded.roleId;
+        return { userId, roleId };
+    } catch (error) {
+        console.error("Invalid token", error);
+        return null;
+    }
+}
+
+// Example usage:
+const token = localStorage.getItem('jwtToken'); // Assuming token is stored in localStorage
+const userInfo = getUserInfoFromToken(token);
+console.log('User ID:', userInfo.userId);
+console.log('Role ID:', userInfo.roleId);
+
+const userId = userInfo.userId; 
+console.log("User ID: "userId)
 
 // Funkcija za dohvaćanje profila i popunjavanje podataka
 function fetchProfile() {
