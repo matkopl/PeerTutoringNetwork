@@ -194,6 +194,8 @@ namespace PeerTutoringNetwork.Controllers
                         Id = user.UserId,
                         Username = user.Username,
                         Email = user.Email,
+                        FirstName =user.FirstName,
+                        LastName=user.LastName,
                         Role = user.Role.RoleName
                     })
                     .ToList();
