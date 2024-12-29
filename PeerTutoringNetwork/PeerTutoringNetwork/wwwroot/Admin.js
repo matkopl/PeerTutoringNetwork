@@ -57,19 +57,27 @@ function fetchUsers() {
 }
 
 // Add or Edit User using Register action
-// Add User
 function addUser(event) {
-    event.preventDefault();
+    event.preventDefault(); // Spriječava ponovno učitavanje stranice
 
+    // Kreiraj objekt s podacima korisnika
     const user = {
-        username: document.getElementById('username').value,
-        email: document.getElementById('email').value,
-        password: document.getElementById('password').value,
-        firstName: document.getElementById('firstName').value,
-        lastName: document.getElementById('lastName').value,
-        roleId: parseInt(document.getElementById('role').value, 10)
+        username: document.getElementById('username').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        password: document.getElementById('password').value.trim(),
+        firstName: document.getElementById('firstName').value.trim(),
+        lastName: document.getElementById('lastName').value.trim(),
+        phone: document.getElementById('phone').value.trim(), // Dodano Phone Number
+        roleId: parseInt(document.getElementById('role').value, 10),
     };
 
+    // Provjera obaveznih polja
+    if (!user.username || !user.email || !user.password || !user.firstName || !user.lastName || !user.phone) {
+        alert('All fields are required!');
+        return;
+    }
+
+    // Pošalji POST zahtjev za dodavanje korisnika
     fetch('/api/User/AddUser', {
         method: 'POST',
         headers: {
@@ -80,12 +88,19 @@ function addUser(event) {
     })
         .then(response => {
             if (!response.ok) throw new Error('Failed to add user');
+            return response.json();
+        })
+        .then(data => {
             alert('User added successfully');
             hideUserForm();
-            fetchUsers();
+            fetchUsers(); // Osvježi tablicu korisnika
         })
-        .catch(error => console.error('Error adding user:', error));
+        .catch(error => {
+            console.error('Error adding user:', error);
+            alert(`Error: ${error.message}`);
+        });
 }
+
 
 // Edit User
 function editUser(userId) {

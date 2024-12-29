@@ -268,6 +268,7 @@ namespace PeerTutoringNetwork.Controllers
                     PwdSalt = Convert.FromBase64String(salt),
                     FirstName = userDto.FirstName,
                     LastName = userDto.LastName,
+                    Phone = userDto.Phone,
                     RoleId = userDto.RoleId
                 };
 
