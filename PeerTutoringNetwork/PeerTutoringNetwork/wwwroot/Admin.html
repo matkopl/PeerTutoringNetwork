@@ -1,0 +1,98 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <!-- Navigacijska traka -->
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="/MentorDashboard/index">Home</a></li>
+            <li><a href="/Login.html" onclick="logout()">Logout</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <!-- Statistika korisnika -->
+        <div id="statistics" class="statistics">
+            <p id="user-count">Trenutni broj korisnika: 0</p>
+        </div>
+
+        <!-- Sekcija za upravljanje korisnicima -->
+        <section class="user-management">
+            <div class="header">
+                <h2>User Management</h2>
+                <button class="btn-primary" onclick="showAddUserForm()">Add User</button>
+            </div>
+            <table id="user-table" class="user-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dinamički popunjavanje korisnika -->
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Forma za dodavanje/uređivanje korisnika -->
+        <section id="user-form" class="form-container hidden">
+            <h2 id="form-title">Add User</h2>
+            <form onsubmit="submitUserForm(event)">
+                <input type="hidden" id="user-id">
+                <!-- Username -->
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" required>
+                </div>
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" required>
+                </div>
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password">
+                </div>
+                <!-- First Name -->
+                <div class="form-group">
+                    <label for="firstName">First Name:</label>
+                    <input type="text" id="firstName" required>
+                </div>
+                <!-- Last Name -->
+                <div class="form-group">
+                    <label for="lastName">Last Name:</label>
+                    <input type="text" id="lastName" required>
+                </div>
+                <!-- Role -->
+                <div class="form-group">
+                    <label for="role">Role:</label>
+                    <select id="role" required>
+                        <option value="3">Admin</option>
+                        <option value="2">Mentor</option>
+                        <option value="1">Student</option>
+                    </select>
+                </div>
+                <!-- Buttons -->
+                <div class="form-buttons">
+                    <button class="btn-primary" type="submit">Save</button>
+                    <button class="btn-secondary" type="button" onclick="hideUserForm()">Cancel</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <script src="admin.js"></script>
+</body>
+</html>
