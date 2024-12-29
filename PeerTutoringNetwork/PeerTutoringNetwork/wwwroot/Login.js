@@ -10,7 +10,7 @@
         data: JSON.stringify(loginData),
         contentType: 'application/json'
     }).done(function (tokenData) {
-        Alert(tokenData);
+        console.log(tokenData);
         localStorage.setItem("JWT", tokenData);
 
         // redirect

@@ -18,9 +18,7 @@ const userInfo = getUserInfoFromToken(token);
 console.log('User ID:', userInfo.userId);
 console.log('Role ID:', userInfo.roleId);
 
-const userId = userInfo.userId; 
-console.log("User ID: "userId)
-
+var userId = userInfo.userId; 
 // Funkcija za dohvaćanje profila i popunjavanje podataka
 function fetchProfile() {
     fetch(`/api/User/GetProfile?userId=${userId}`)
