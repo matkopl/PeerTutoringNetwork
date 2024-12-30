@@ -60,24 +60,21 @@ function fetchUsers() {
 function addUser(event) {
     event.preventDefault(); // Spriječava ponovno učitavanje stranice
 
-    // Kreiraj objekt s podacima korisnika
     const user = {
         username: document.getElementById('username').value.trim(),
         email: document.getElementById('email').value.trim(),
         password: document.getElementById('password').value.trim(),
         firstName: document.getElementById('firstName').value.trim(),
         lastName: document.getElementById('lastName').value.trim(),
-        phone: document.getElementById('phone').value.trim(), // Dodano Phone Number
+        phone: document.getElementById('phone').value.trim(),
         roleId: parseInt(document.getElementById('role').value, 10),
     };
 
-    // Provjera obaveznih polja
     if (!user.username || !user.email || !user.password || !user.firstName || !user.lastName || !user.phone) {
         alert('All fields are required!');
         return;
     }
 
-    // Pošalji POST zahtjev za dodavanje korisnika
     fetch('/api/User/AddUser', {
         method: 'POST',
         headers: {
@@ -87,11 +84,15 @@ function addUser(event) {
         body: JSON.stringify(user)
     })
         .then(response => {
-            if (!response.ok) throw new Error('Failed to add user');
+            if (!response.ok) {
+                return response.json().then(errorData => {
+                    throw new Error(errorData.message || 'Failed to add user');
+                });
+            }
             return response.json();
         })
         .then(data => {
-            alert('User added successfully');
+            alert(data.message); // Prikaži poruku iz odgovora
             hideUserForm();
             fetchUsers(); // Osvježi tablicu korisnika
         })

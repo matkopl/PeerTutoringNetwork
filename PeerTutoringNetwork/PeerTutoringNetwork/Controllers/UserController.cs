@@ -251,15 +251,12 @@ namespace PeerTutoringNetwork.Controllers
         {
             try
             {
-                // Provjera postoji li korisnik s istim korisničkim imenom ili emailom
                 if (_context.Users.Any(x => x.Username == userDto.Username || x.Email == userDto.Email))
-                    return BadRequest("User with the same username or email already exists");
+                    return BadRequest(new { message = "User with the same username or email already exists" });
 
-                // Hashiranje lozinke i generiranje salt-a
                 var salt = PasswordHashProvider.GetSalt();
                 var hash = PasswordHashProvider.GetHash(userDto.Password, salt);
 
-                // Kreiraj novog korisnika
                 var user = new User
                 {
                     Username = userDto.Username,
@@ -272,15 +269,15 @@ namespace PeerTutoringNetwork.Controllers
                     RoleId = userDto.RoleId
                 };
 
-                // Dodaj korisnika u bazu
                 _context.Users.Add(user);
                 _context.SaveChanges();
 
-                return Ok("User added successfully");
+                // Vraćamo JSON s porukom i korisnikom
+                return Ok(new { message = "User added successfully", user });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, new { message = ex.Message });
             }
         }
 
