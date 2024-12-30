@@ -105,7 +105,7 @@ function addUser(event) {
 
 // Edit User
 function editUser(userId) {
-    fetch(`/api/User/GetUserById/${userId}`, {
+    fetch(`/api/User/GetProfile/${userId}`, {
         headers: {
             'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
         }
