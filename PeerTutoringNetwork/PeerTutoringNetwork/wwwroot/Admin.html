@@ -9,9 +9,11 @@
 <body>
     <!-- Navigacijska traka -->
     <nav class="navbar">
-        <ul class="nav-links">
+        <ul class="nav-left">
             <li><a href="Admin.html">Home</a></li>
             <li><a href="Profile.html">Profile Page</a></li>
+        </ul>
+        <ul class="nav-right">
             <li><a href="/Login.html" onclick="logout()">Logout</a></li>
         </ul>
     </nav>
@@ -19,7 +21,15 @@
     <main>
         <!-- Statistika korisnika -->
         <div id="statistics" class="statistics">
-            <p id="user-count">Trenutni broj korisnika: 0</p>
+            <div class="stat-item">
+                <p id="user-count">User Count: 0</p>
+            </div>
+            <div class="stat-item">
+                <p id="student-count">Student Count: 0</p>
+            </div>
+            <div class="stat-item">
+                <p id="teacher-count">Teacher Count: 0</p>
+            </div>
         </div>
 
         <!-- Sekcija za upravljanje korisnicima -->

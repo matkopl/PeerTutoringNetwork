@@ -1,5 +1,10 @@
 ﻿import jwt_decode from 'jwt-decode';
 
+const token = localStorage.getItem('jwtToken');
+if (token) {
+    const decoded = jwt_decode(token);
+    console.log(decoded);
+}
 function getUserInfoFromToken(token) {
     try {
         const decoded = jwt_decode(token);
@@ -13,12 +18,12 @@ function getUserInfoFromToken(token) {
 }
 
 // Example usage:
-const token = localStorage.getItem('jwtToken'); // Assuming token is stored in localStorage
 const userInfo = getUserInfoFromToken(token);
 console.log('User ID:', userInfo.userId);
 console.log('Role ID:', userInfo.roleId);
 
-var userId = userInfo.userId; 
+//var userId = userInfo.userId; 
+var userId = userInfo.roleId; 
 // Funkcija za dohvaćanje profila i popunjavanje podataka
 function fetchProfile() {
     fetch(`/api/User/GetProfile?userId=${userId}`)
@@ -46,10 +51,9 @@ function logout() {
 
 // Funkcija za ažuriranje profila 
 function updateProfile(event) {
-    event.preventDefault();
+    event.preventDefault(); // Sprečava ponovno učitavanje stranice
 
     const updateDto = {
-        userId: userId,
         firstName: document.getElementById('firstName').value,
         lastName: document.getElementById('lastName').value,
         email: document.getElementById('email').value,
@@ -67,6 +71,7 @@ function updateProfile(event) {
         })
         .catch(error => console.error('Error updating profile:', error));
 }
+
 
 // Funkcija za brisanje neobaveznih podataka 
 function clearOptionalData() {

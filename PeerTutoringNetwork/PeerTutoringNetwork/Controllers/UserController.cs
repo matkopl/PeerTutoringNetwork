@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Common;
 using PeerTutoringNetwork.DTO;
 using PeerTutoringNetwork.DTOs;
 using PeerTutoringNetwork.Security;
@@ -95,7 +96,11 @@ namespace PeerTutoringNetwork.Controllers
                     existingUser.RoleId.ToString()
                 );
 
-                return Ok(serializedToken);
+                return Ok(new
+                {
+                    token = serializedToken,
+                    expiresIn = 60 * 60 // Token vrijedi 1 sat
+                });
             }
             catch (Exception ex)
             {
@@ -109,6 +114,7 @@ namespace PeerTutoringNetwork.Controllers
             try
             {
                 var user = _context.Users
+                    .Where(u => u.UserId == userId)
                     .Select(u => new UserProfileDto
                     {
                         UserId = u.UserId,
@@ -119,7 +125,7 @@ namespace PeerTutoringNetwork.Controllers
                         Username = u.Username,
                         RoleId = u.RoleId
                     })
-                    .FirstOrDefault(u => u.UserId == userId);
+                    .FirstOrDefault();
 
                 if (user == null)
                     return NotFound("User not found");

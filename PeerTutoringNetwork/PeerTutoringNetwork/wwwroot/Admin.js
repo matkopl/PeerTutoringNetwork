@@ -19,6 +19,28 @@ function fetchStatistics() {
         .catch(error => console.error('Error fetching statistics:', error));
 }
 
+function fetchRoleStatistics() {
+    fetch('/api/Admin/GetRoleStatistics', {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
+        }
+    })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to fetch role statistics');
+            return response.json();
+        })
+        .then(data => {
+            // Pronađi broj studenata i teachera
+            const studentCount = data.find(role => role.roleId === 1)?.count || 0; // RoleId 1 = Student
+            const teacherCount = data.find(role => role.roleId === 2)?.count || 0; // RoleId 2 = Teacher
+
+            // Ažuriraj statistiku na stranici
+            document.getElementById('student-count').innerText = `Broj studenata: ${studentCount}`;
+            document.getElementById('teacher-count').innerText = `Broj teachera: ${teacherCount}`;
+        })
+        .catch(error => console.error('Error fetching role statistics:', error));
+}
+
 // Fetch and display users
 function fetchUsers() {
     fetch('/api/User/GetAllUsers', {
@@ -95,6 +117,8 @@ function addUser(event) {
             alert(data.message); // Prikaži poruku iz odgovora
             hideUserForm();
             fetchUsers(); // Osvježi tablicu korisnika
+            fetchStatistics();
+            fetchRoleStatistics();
         })
         .catch(error => {
             console.error('Error adding user:', error);
@@ -105,42 +129,52 @@ function addUser(event) {
 
 // Edit User
 function editUser(userId) {
-    fetch(`/api/User/GetProfile/${userId}`, {
+    console.log('Editing user with ID:', userId); // Debugging
+
+    fetch(`/api/User/GetProfile?userId=${userId}`, {
         headers: {
             'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
         }
     })
         .then(response => {
+            console.log('Response status:', response.status); // Ispis statusa
             if (!response.ok) throw new Error('Failed to fetch user data');
             return response.json();
         })
         .then(user => {
+            console.log('Fetched user data:', user); // Debugging podataka
+
+            // Popunjavanje forme za uređivanje
+            document.getElementById('form-title').innerText = 'Edit User';
             document.getElementById('user-id').value = user.userId;
             document.getElementById('username').value = user.username;
             document.getElementById('email').value = user.email;
             document.getElementById('password').value = ''; // Lozinka se ne prikazuje
+            document.getElementById('phone').value = user.phone || ''; // Ako phone nije definiran
             document.getElementById('firstName').value = user.firstName;
             document.getElementById('lastName').value = user.lastName;
             document.getElementById('role').value = user.roleId;
 
+            // Prikaži formu za uređivanje
             document.getElementById('user-form').style.display = 'block';
         })
         .catch(error => console.error('Error fetching user data:', error));
 }
 
+
 function updateUser(event) {
     event.preventDefault();
 
-    const userId = document.getElementById('user-id').value;
+    const userId = document.GetProfile('user-id').value;
 
     const user = {
         userId: parseInt(userId, 10),
-        username: document.getElementById('username').value,
-        email: document.getElementById('email').value,
-        password: document.getElementById('password').value || null, // Optional password
-        firstName: document.getElementById('firstName').value,
-        lastName: document.getElementById('lastName').value,
-        roleId: parseInt(document.getElementById('role').value, 10)
+        username: document.GetProfile('username').value,
+        email: document.GetProfile('email').value,
+        password: document.GetProfile('password').value || null, // Optional password
+        firstName: document.GetProfile('firstName').value,
+        lastName: document.GetProfile('lastName').value,
+        roleId: parseInt(document.GetProfile('role').value, 10)
     };
 
     fetch('/api/User/EditUser', {
@@ -156,6 +190,7 @@ function updateUser(event) {
             alert('User updated successfully');
             hideUserForm();
             fetchUsers();
+            fetchRoleStatistics();
         })
         .catch(error => console.error('Error updating user:', error));
 }
@@ -177,6 +212,7 @@ function deleteUser(userId) {
             alert('User deleted successfully');
             fetchUsers(); // Ponovno dohvaćanje korisnika
             fetchStatistics();
+            fetchRoleStatistics();
         })
         .catch(error => console.error('Error deleting user:', error));
 }
@@ -208,3 +244,4 @@ function logout() {
 // Initialize page
 fetchStatistics();
 fetchUsers();
+fetchRoleStatistics();
