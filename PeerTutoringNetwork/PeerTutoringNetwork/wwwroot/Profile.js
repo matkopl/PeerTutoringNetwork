@@ -1,80 +1,36 @@
-﻿const jwtDecode = '../node_modules/jwt-decode/build/cjs/index.js';
+﻿const userId = 1; // Pretpostavljamo da imamo userId iz sesije ili tokena
 
-// Dohvati token iz LocalStorage
-const token = localStorage.getItem('jwtToken');
-if (!token) {
-    alert('You are not logged in!');
-    window.location.href = '/Login.html'; // Preusmjeri na login ako token nije prisutan
-}
-
-// Dekodiranje tokena i dohvaćanje userId
-function getUserInfoFromToken(token) {
-    try {
-        const decoded = jwt_decode(token);
-        return { userId: decoded.userId, roleId: decoded.roleId };
-    } catch (error) {
-        console.error("Invalid token", error);
-        return null;
-    }
-}
-
-const userInfo = getUserInfoFromToken(token);
-if (!userInfo) {
-    alert('Invalid session. Please log in again.');
-    window.location.href = '/Login.html';
-}
-
-const userId = userInfo.roleId;
-
-
-// Dohvati korisničke podatke
-/*function fetchProfile() {
-    fetch(`/api/User/GetProfile?userId=${userId}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-    })
-        .then(response => {
-            if (!response.ok) throw new Error('Failed to fetch profile');
-            return response.json();
-        })
-        .then(data => {
-            // Popuni formu podacima
-            document.getElementById('username').value = data.username;
-            document.getElementById('firstName').value = data.firstName;
-            document.getElementById('lastName').value = data.lastName;
-            document.getElementById('email').value = data.email;
-            document.getElementById('phone').value = data.phone;
-        })
-        .catch(error => console.error('Error fetching profile:', error));
-}*/
+// Funkcija za dohvaćanje profila i popunjavanje podataka
 function fetchProfile() {
-    fetch('/api/User/GetProfile', {
-        headers: {
-            'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
-        }
-    })
-        .then(response => {
-            if (!response.ok) throw new Error('Failed to fetch profile');
-            return response.json();
-        })
+    fetch(`/api/User/GetProfile?userId=${userId}`)
+        .then(response => response.json())
         .then(data => {
-            // Popuni formu s podacima korisnika
+            // Popunjavanje forme podacima
             document.getElementById('username').value = data.username;
             document.getElementById('firstName').value = data.firstName;
             document.getElementById('lastName').value = data.lastName;
             document.getElementById('email').value = data.email;
             document.getElementById('phone').value = data.phone;
+
+            // Prikaz korisničkog imena u navigaciji
+            document.getElementById('username-navbar').innerText = data.username;
         })
         .catch(error => console.error('Error fetching profile:', error));
 }
 
+// Logout funkcija
+function logout() {
+    // Ovde možete dodati brisanje tokena iz localStorage-a ili cookie-a
+    alert('Successfully logged out!');
+    window.location.href = '/Login.html'; // Preusmeravanje na login stranicu
+}
 
-// Ažuriraj korisničke podatke
+// Funkcija za ažuriranje profila (ostaje ista)
 function updateProfile(event) {
     event.preventDefault();
 
     const updateDto = {
         userId: userId,
-        username: document.getElementById('username').value,
         firstName: document.getElementById('firstName').value,
         lastName: document.getElementById('lastName').value,
         email: document.getElementById('email').value,
@@ -83,10 +39,7 @@ function updateProfile(event) {
 
     fetch('/api/User/UpdateProfile', {
         method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updateDto)
     })
         .then(response => {
@@ -96,25 +49,17 @@ function updateProfile(event) {
         .catch(error => console.error('Error updating profile:', error));
 }
 
-// Brisanje neobaveznih podataka
+// Funkcija za brisanje neobaveznih podataka (ostaje ista)
 function clearOptionalData() {
     fetch(`/api/User/ClearOptionalData?userId=${userId}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+        method: 'DELETE'
     })
         .then(response => {
             if (!response.ok) throw new Error('Failed to clear optional data');
             alert('Optional data cleared successfully');
-            fetchProfile();
+            fetchProfile(); // Ponovno dohvaćanje podataka
         })
         .catch(error => console.error('Error clearing optional data:', error));
-}
-
-// Logout funkcija
-function logout() {
-    localStorage.removeItem('jwtToken');
-    alert('Successfully logged out!');
-    window.location.href = '/Login.html';
 }
 
 // Automatski učitaj podatke pri otvaranju stranice
