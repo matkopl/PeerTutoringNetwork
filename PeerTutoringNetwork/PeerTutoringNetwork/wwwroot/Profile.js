@@ -69,7 +69,7 @@ function updateProfile(event) {
     event.preventDefault();
 
     const updateDto = {
-        userId: userId,
+        userId: userInfo.userId,
         username: document.getElementById('username').value,
         firstName: document.getElementById('firstName').value,
         lastName: document.getElementById('lastName').value,
@@ -93,7 +93,7 @@ function updateProfile(event) {
 }
 // Brisanje neobaveznih podataka
 function clearOptionalData() {
-    fetch(`/api/User/ClearOptionalData?userId=${userId}`, {
+    fetch(`/api/User/ClearOptionalData?userId=${userInfo.userId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
     })

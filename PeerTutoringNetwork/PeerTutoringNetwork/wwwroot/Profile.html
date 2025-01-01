@@ -9,10 +9,10 @@
 <body>
     <!-- Navbar -->
     <div class="navbar">
-        <div class="logo">Peer Tutoring Network</div>
-        <div class="nav-links">
+        <div class="navbar-logo">Peer Tutoring Network</div>
+        <div class="navbar-links">
             <a href="MentorDashboard/index">Home</a>
-            <a href="#" class="logout" onclick="logout()">Logout</a>
+            <a href="/Login.html" class="logout" onclick="logout()">Logout</a>
         </div>
     </div>
 
@@ -46,7 +46,15 @@
             </div>
         </form>
     </div>
-    <script type="module" src="./Profile.js"></script>
+    <script>
+        // Logout funkcija
+        function logout() {
+            localStorage.removeItem('jwtToken');
+            alert('Successfully logged out!');
+            window.location.href = '/Login.html';
+        }
+    </script>
+    <script type="module" src="Profile.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
 </body>
 </html>
