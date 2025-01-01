@@ -25,12 +25,15 @@
             // Preusmjeri prema ulozi
             if (roleId == 3) {
                 window.location.href = "Admin.html"; // Admin
+                console.log(roleId);
             }
             else if (roleId == 2) {
                 window.location.href = "MentorDashboard/Index"; // Tutor
+                console.log(roleId);
             }
             else if (roleId == 1) {
-                window.location.href = "Profile.html"; // Ostali
+                window.location.href = "Profile.html"; // Stavi StudentDashboard/Index MATKOOOOOO
+                console.log(roleId);
             }
             else {
                 alert("Unknown role ID: " + roleId);

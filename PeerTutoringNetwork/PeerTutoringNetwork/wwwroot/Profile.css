@@ -24,22 +24,17 @@ body, html {
         letter-spacing: 1px;
     }
 
-    .navbar .nav-links {
-        display: flex;
-        gap: 1rem;
+    .navbar .nav-links a {
+        color: #fff;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        transition: background-color 0.3s ease-in-out;
     }
 
-        .navbar .nav-links a {
-            color: #fff;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            transition: background-color 0.3s ease-in-out;
+        .navbar .nav-links a:hover {
+            background-color: #444450;
         }
-
-            .navbar .nav-links a:hover {
-                background-color: #444450;
-            }
 
 /* Profile Container */
 .profile-container {
@@ -58,7 +53,6 @@ body, html {
         color: #2c2c34;
     }
 
-    /* Input Fields */
     .profile-container label {
         display: block;
         margin: 0.5rem 0 0.3rem;
@@ -79,7 +73,6 @@ body, html {
             outline: none;
         }
 
-    /* Buttons */
     .profile-container .button-group {
         display: flex;
         gap: 1rem;
@@ -100,9 +93,9 @@ body, html {
         color: #fff;
     }
 
-    .profile-container #save-button:hover {
-        background-color: #444450;
-    }
+        .profile-container #save-button:hover {
+            background-color: #444450;
+        }
 
     .profile-container #clear-button {
         background-color: #c0392b;
@@ -112,3 +105,5 @@ body, html {
         .profile-container #clear-button:hover {
             background-color: #e74c3c;
         }
+
+

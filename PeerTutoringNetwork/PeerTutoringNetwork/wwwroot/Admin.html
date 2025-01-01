@@ -107,6 +107,46 @@
                 </div>
             </form>
         </section>
+
+        <!-- Forma za uređivanje korisnika -->
+        <section id="edit-user-form" class="form-container hidden">
+            <h2>Edit User</h2>
+            <form onsubmit="editUser(event)">
+                <input type="hidden" id="edit-user-id">
+                <div class="form-group">
+                    <label for="edit-username">Username:</label>
+                    <input type="text" id="edit-username" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="edit-email">Email:</label>
+                    <input type="email" id="edit-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-phone">Phone Number:</label>
+                    <input type="text" id="edit-phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-firstName">First Name:</label>
+                    <input type="text" id="edit-firstName" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-lastName">Last Name:</label>
+                    <input type="text" id="edit-lastName" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-role">Role:</label>
+                    <select id="edit-role" required>
+                        <option value="3">Admin</option>
+                        <option value="2">Teacher</option>
+                        <option value="1">Student</option>
+                    </select>
+                </div>
+                <div class="form-buttons">
+                    <button class="btn-primary" type="submit">Save Changes</button>
+                    <button class="btn-secondary" type="button" onclick="hideEditUserForm()">Cancel</button>
+                </div>
+            </form>
+        </section>
     </main>
 
     <script src="admin.js"></script>

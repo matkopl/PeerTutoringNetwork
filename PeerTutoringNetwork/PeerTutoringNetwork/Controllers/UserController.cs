@@ -109,10 +109,17 @@ namespace PeerTutoringNetwork.Controllers
         }
 
         [HttpGet("[action]")]
-        public ActionResult GetProfile(int userId)
+        public ActionResult GetProfile()
         {
             try
             {
+                // Dohvati userId iz JWT tokena
+                var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+                if (userIdClaim == null)
+                    return Unauthorized("Invalid token");
+
+                int userId = int.Parse(userIdClaim);
+
                 var user = _context.Users
                     .Where(u => u.UserId == userId)
                     .Select(u => new UserProfileDto
@@ -137,6 +144,7 @@ namespace PeerTutoringNetwork.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
 
         [HttpPut("[action]")]
         public ActionResult UpdateProfile(UserProfileUpdateDto updateDto)

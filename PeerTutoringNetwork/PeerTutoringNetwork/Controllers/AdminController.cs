@@ -1,4 +1,5 @@
 ﻿using BL.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,39 @@ namespace PeerTutoringNetwork.Controllers
         {
             _configuration = configuration;
             _context = context;
+        }
+
+        [HttpGet("[action]/{userId}")]
+        public ActionResult GetUserById(int userId)
+        {
+            try
+            {
+                // Dohvati korisnika prema userId
+                var user = _context.Users
+                    .Where(u => u.UserId == userId)
+                    .Select(u => new UserProfileDto
+                    {
+                        UserId = u.UserId,
+                        Username = u.Username,
+                        Email = u.Email,
+                        FirstName = u.FirstName,
+                        LastName = u.LastName,
+                        Phone = u.Phone,
+                        RoleId = u.RoleId
+                    })
+                    .FirstOrDefault();
+
+                if (user == null)
+                {
+                    return NotFound("User not found");
+                }
+
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
 
