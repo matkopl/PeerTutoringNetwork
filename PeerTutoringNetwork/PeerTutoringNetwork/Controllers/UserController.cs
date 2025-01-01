@@ -1,7 +1,9 @@
 ﻿using BL.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Common;
 using PeerTutoringNetwork.DTO;
 using PeerTutoringNetwork.DTOs;
 using PeerTutoringNetwork.Security;
@@ -21,23 +23,7 @@ namespace PeerTutoringNetwork.Controllers
             _context = context;
         }
 
-        [HttpGet("[action]")]
-        public ActionResult GetToken()
-        {
-            try
-            {
-                // The same secure key must be used here to create JWT,
-                // as the one that is used by middleware to verify JWT
-                var secureKey = _configuration["JWT:SecureKey"];
-                var serializedToken = JwtTokenProvider.CreateToken(secureKey, 10);
 
-                return Ok(serializedToken);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
         [HttpPost("[action]")]
         public ActionResult<UserRegisterDto> Register(UserRegisterDto registerDto)
         {
@@ -49,19 +35,19 @@ namespace PeerTutoringNetwork.Controllers
                     return BadRequest($"Username {trimmedUsername} already exists");
 
                 // Hashiranje i generiranje salt-a pri registraciji
-                var b64salt = PasswordHashProvider.GetSalt(); // Ovo je već u Base64 string formatu
-                var b64hash = PasswordHashProvider.GetHash(registerDto.Password, b64salt); // Također vraća Base64 hash
+                var b64salt = PasswordHashProvider.GetSalt();
+                var b64hash = PasswordHashProvider.GetHash(registerDto.Password, b64salt);
 
                 Console.WriteLine($"Salt (Base64): {b64salt}");
                 Console.WriteLine($"Hash (Base64): {b64hash}");
 
-                // Pohranjujemo u bazi kao byte[], zato ih konvertujemo:
+
                 var user = new User
                 {
                     UserId = registerDto.Id,
                     Username = registerDto.Username,
-                    PwdHash = Convert.FromBase64String(b64hash), // Konvertiramo hash u byte[]
-                    PwdSalt = Convert.FromBase64String(b64salt), // Konvertiramo salt u byte[]
+                    PwdHash = Convert.FromBase64String(b64hash),
+                    PwdSalt = Convert.FromBase64String(b64salt),
                     FirstName = registerDto.FirstName,
                     LastName = registerDto.LastName,
                     Email = registerDto.Email,
@@ -69,11 +55,11 @@ namespace PeerTutoringNetwork.Controllers
                     RoleId = registerDto.RoleId
                 };
 
-                // Dodavanje korisnika u bazu
+
                 _context.Add(user);
                 _context.SaveChanges();
 
-                // Update DTO Id to return it to the client
+
                 registerDto.Id = user.UserId;
 
                 return Ok(registerDto);
@@ -90,47 +76,52 @@ namespace PeerTutoringNetwork.Controllers
         {
             try
             {
-                var genericLoginFail = "Incorrect username or password";
-
-                // Trim korisničkog imena za sigurnost
-                var trimmedUsername = loginDto.Username.Trim();
-
-                // Dohvati korisnika prema obrezanom korisničkom imenu
-                var existingUser = _context.Users.FirstOrDefault(x => x.Username == trimmedUsername);
+                var existingUser = _context.Users.FirstOrDefault(x => x.Username == loginDto.Username);
                 if (existingUser == null)
                     return Unauthorized("Username does not exist");
 
-                // Pretvori salt iz baze (byte[] u Base64 string)
                 var saltBase64 = Convert.ToBase64String(existingUser.PwdSalt);
-
-                // Generiraj hash unesenog passworda koristeći salt iz baze
                 var computedHashBase64 = PasswordHashProvider.GetHash(loginDto.Password, saltBase64);
-
-                // Dohvati spremljeni hash iz baze u Base64 formatu
                 var storedHashBase64 = Convert.ToBase64String(existingUser.PwdHash);
 
-                // Usporedi generirani hash sa spremljenim hashom
                 if (computedHashBase64 != storedHashBase64)
                     return Unauthorized("Incorrect password");
 
-                // Kreiraj JWT token
                 var secureKey = _configuration["JWT:SecureKey"];
-                var serializedToken = JwtTokenProvider.CreateToken(secureKey, 60, trimmedUsername);
+                var serializedToken = JwtTokenProvider.CreateToken(
+                    secureKey,
+                    60,
+                    existingUser.Username,
+                    existingUser.UserId.ToString(),
+                    existingUser.RoleId.ToString()
+                );
 
-                // Vrati token
-                return Ok(serializedToken);
+                return Ok(new
+                {
+                    token = serializedToken,
+                    expiresIn = 60 * 60 // Token vrijedi 1 sat
+                });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
+
         [HttpGet("[action]")]
-        public ActionResult GetProfile(int userId)
+        public ActionResult GetProfile()
         {
             try
             {
+                // Dohvati userId iz JWT tokena
+                var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+                if (userIdClaim == null)
+                    return Unauthorized("Invalid token");
+
+                int userId = int.Parse(userIdClaim);
+
                 var user = _context.Users
+                    .Where(u => u.UserId == userId)
                     .Select(u => new UserProfileDto
                     {
                         UserId = u.UserId,
@@ -141,7 +132,7 @@ namespace PeerTutoringNetwork.Controllers
                         Username = u.Username,
                         RoleId = u.RoleId
                     })
-                    .FirstOrDefault(u => u.UserId == userId);
+                    .FirstOrDefault();
 
                 if (user == null)
                     return NotFound("User not found");
@@ -153,6 +144,7 @@ namespace PeerTutoringNetwork.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
 
         [HttpPut("[action]")]
         public ActionResult UpdateProfile(UserProfileUpdateDto updateDto)
@@ -204,7 +196,141 @@ namespace PeerTutoringNetwork.Controllers
             }
         }
 
+        [HttpGet("GetAllUsers")]
+        public IActionResult GetAllUsers()
+        {
+            try
+            {
+                // Dohvaćanje svih korisnika iz baze
+                var users = _context.Users
+                    .Select(user => new
+                    {
+                        Id = user.UserId,
+                        Username = user.Username,
+                        Email = user.Email,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Role = user.Role.RoleName
+                    })
+                    .ToList();
 
+                return Ok(users); // Vraća korisnike kao JSON
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpDelete("DeleteUser/{id}")]
+
+        public IActionResult DeleteUser(int id)
+        {
+            try
+            {
+                var user = _context.Users.Find(id);
+                if (user == null)
+                {
+                    return NotFound("User not found");
+                }
+
+                _context.Users.Remove(user);
+                _context.SaveChanges();
+
+                return Ok("User deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("GetUserStatistics")]
+
+        public IActionResult GetUserStatistics()
+        {
+            try
+            {
+                var totalUsers = _context.Users.Count();
+                return Ok(new { totalUsers });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+
+        }
+        [HttpPost("[action]")]
+        public ActionResult AddUser(UserRegisterDto userDto)
+        {
+            try
+            {
+                if (_context.Users.Any(x => x.Username == userDto.Username || x.Email == userDto.Email))
+                    return BadRequest(new { message = "User with the same username or email already exists" });
+
+                var salt = PasswordHashProvider.GetSalt();
+                var hash = PasswordHashProvider.GetHash(userDto.Password, salt);
+
+                var user = new User
+                {
+                    Username = userDto.Username,
+                    Email = userDto.Email,
+                    PwdHash = Convert.FromBase64String(hash),
+                    PwdSalt = Convert.FromBase64String(salt),
+                    FirstName = userDto.FirstName,
+                    LastName = userDto.LastName,
+                    Phone = userDto.Phone,
+                    RoleId = userDto.RoleId
+                };
+
+                _context.Users.Add(user);
+                _context.SaveChanges();
+
+                // Vraćamo JSON s porukom i korisnikom
+                return Ok(new { message = "User added successfully", user });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+        [HttpPut("[action]")]
+        public ActionResult EditUser(UserUpdateDto userDto)
+        {
+            try
+            {
+                // Pronađi postojećeg korisnika prema ID-u
+                var user = _context.Users.FirstOrDefault(x => x.UserId == userDto.UserId);
+                if (user == null)
+                    return NotFound("User not found");
+
+                // Ažuriraj podatke korisnika
+                user.Username = userDto.Username;
+                user.Email = userDto.Email;
+                user.FirstName = userDto.FirstName;
+                user.LastName = userDto.LastName;
+                user.RoleId = userDto.RoleId;
+
+                // Lozinka (opcionalno, samo ako je poslano)
+                if (!string.IsNullOrEmpty(userDto.Password))
+                {
+                    var salt = PasswordHashProvider.GetSalt();
+                    var hash = PasswordHashProvider.GetHash(userDto.Password, salt);
+                    user.PwdHash = Convert.FromBase64String(hash);
+                    user.PwdSalt = Convert.FromBase64String(salt);
+                }
+
+                // Spremi promjene
+                _context.SaveChanges();
+
+                return Ok("User updated successfully");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
 
     }
 }
