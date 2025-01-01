@@ -396,3 +396,9 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+
+.DS_Store
+.idea
+appsettings.json
+PeerTutoringNetwork/PeerTutoringNetwork/appsettings.Development.json

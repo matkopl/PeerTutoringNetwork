@@ -19,7 +19,6 @@
 
         alert("Succesful registration.")
         window.location.href = "Login.html";
-       
     }).fail(function (err) {
         alert(err.responseText);
 
