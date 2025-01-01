@@ -3,47 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Profile</title>
+    <title>Profile</title>
     <link rel="stylesheet" href="Profile.css">
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <span class="greeting">Pozdrav, <span id="username-navbar"></span>!</span>
-        <button id="logout-button" onclick="logout()">Logout</button>
-    </nav>
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="logo">Peer Tutoring Network</div>
+        <div class="nav-links">
+            <a href="MentorDashboard/index">Home</a>
+            <a href="#" class="logout" onclick="logout()">Logout</a>
+        </div>
+    </div>
 
     <!-- Profile Content -->
     <div class="profile-container">
         <h2>User Profile</h2>
         <form id="profileForm" onsubmit="updateProfile(event)">
-            <div class="profile-section">
-                <!-- Display user details -->
-                <label for="username"><b>Username:</b></label>
-                <input type="text" id="username" name="username" disabled>
+            <!-- Username -->
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" readonly>
 
-                <label for="firstName"><b>First Name:</b></label>
-                <input type="text" id="firstName" name="firstName" placeholder="Enter your first name">
+            <!-- First Name -->
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" name="firstName" required>
 
-                <label for="lastName"><b>Last Name:</b></label>
-                <input type="text" id="lastName" name="lastName" placeholder="Enter your last name">
+            <!-- Last Name -->
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" name="lastName" required>
 
-                <label for="email"><b>Email:</b></label>
-                <input type="email" id="email" name="email" placeholder="Enter your email">
+            <!-- Email -->
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
 
-                <label for="phone"><b>Phone:</b></label>
-                <input type="text" id="phone" name="phone" placeholder="Enter your phone number">
-            </div>
+            <!-- Phone -->
+            <label for="phone">Phone:</label>
+            <input type="text" id="phone" name="phone" required>
 
-            <div class="profile-actions">
-                <!-- Save changes -->
-                <button type="submit" id="save-button">Save Changes</button>
-                <!-- Clear optional data -->
-                <button type="button" id="clear-button" onclick="clearOptionalData()">Clear Optional Data</button>
+            <!-- Buttons -->
+            <div class="button-group">
+                <button id="save-button" type="submit">Save</button>
+                <button id="clear-button" type="button" onclick="clearOptionalData()">Clear Optional Data</button>
             </div>
         </form>
     </div>
 
-    <script src="Profile.js"></script>
+    <script type="module" src="./Profile.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
 </body>
 </html>

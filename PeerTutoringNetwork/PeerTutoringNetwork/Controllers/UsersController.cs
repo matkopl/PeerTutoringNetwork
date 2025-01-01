@@ -164,23 +164,7 @@ namespace PeerTutoringNetwork.Controllers
             return _context.Users.Any(e => e.UserId == id);
         }
 
-        [HttpGet("[action]")]
-        public ActionResult GetToken()
-        {
-            try
-            {
-                // The same secure key must be used here to create JWT,
-                // as the one that is used by middleware to verify JWT
-                var secureKey = _configuration["JWT:SecureKey"];
-                var serializedToken = JwtTokenProvider.CreateToken(secureKey, 10);
-
-                return Ok(serializedToken);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
+       
         [HttpPost("[action]")]
         public ActionResult<UserRegisterDto> Register(UserRegisterDto registerDto)
         {
@@ -262,7 +246,12 @@ namespace PeerTutoringNetwork.Controllers
 
                 // Kreiraj i vrati JWT token
                 var secureKey = _configuration["JWT:SecureKey"];
-                var serializedToken = JwtTokenProvider.CreateToken(secureKey, 60, loginDto.Username);
+                var serializedToken = JwtTokenProvider.CreateToken(
+                    secureKey,
+                    expiration: 60,
+                    userId: existingUser.UserId.ToString(),
+                    roleId: existingUser.RoleId.ToString(),
+                    subject: existingUser.Username);
 
                 return Ok(serializedToken);
             }

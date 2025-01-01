@@ -1,83 +1,109 @@
-﻿/* Global Styles */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
+﻿/* General Reset */
+body, html {
     margin: 0;
     padding: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
 }
 
-/* Navigation Bar */
+/* Navbar */
 .navbar {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 20px;
+    background-color: #2c2c34;
+    color: #fff;
+    padding: 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-    .navbar .greeting {
-        font-size: 18px;
+    .navbar .logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+        letter-spacing: 1px;
     }
 
-    .navbar #logout-button {
-        background-color: #dc3545;
-        border: none;
-        padding: 8px 16px;
-        border-radius: 4px;
-        color: white;
-        cursor: pointer;
-        font-weight: bold;
+    .navbar .nav-links a {
+        color: #fff;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        transition: background-color 0.3s ease-in-out;
     }
+
+        .navbar .nav-links a:hover {
+            background-color: #444450;
+        }
 
 /* Profile Container */
 .profile-container {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 400px;
-    margin: 50px auto;
+    max-width: 600px;
+    margin: 3rem auto;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    text-align: left;
 }
 
-h2 {
-    text-align: center;
-    margin-bottom: 20px;
-}
+    .profile-container h2 {
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+        color: #2c2c34;
+    }
 
-.profile-section label {
-    font-weight: bold;
-    margin-top: 10px;
-    display: block;
-}
+    .profile-container label {
+        display: block;
+        margin: 0.5rem 0 0.3rem;
+        font-weight: bold;
+    }
 
-.profile-section input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
+    .profile-container input {
+        width: 100%;
+        padding: 0.8rem;
+        margin-bottom: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        transition: border 0.3s ease-in-out;
+    }
 
-.profile-actions {
-    display: flex;
-    justify-content: space-between;
-}
+        .profile-container input:focus {
+            border: 1px solid #2c2c34;
+            outline: none;
+        }
 
-button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    color: white;
-    cursor: pointer;
-    font-weight: bold;
-}
+    .profile-container .button-group {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
 
-#save-button {
-    background-color: #28a745;
-}
+    .profile-container button {
+        padding: 0.8rem 1.5rem;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s ease-in-out;
+    }
 
-#clear-button {
-    background-color: #ffc107;
-}
+    .profile-container #save-button {
+        background-color: #2c2c34;
+        color: #fff;
+    }
+
+        .profile-container #save-button:hover {
+            background-color: #444450;
+        }
+
+    .profile-container #clear-button {
+        background-color: #c0392b;
+        color: #fff;
+    }
+
+        .profile-container #clear-button:hover {
+            background-color: #e74c3c;
+        }
+
+
