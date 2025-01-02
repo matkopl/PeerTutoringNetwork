@@ -209,20 +209,41 @@
         }, []);
 
         this.renderEvents(todaysEvents, details);
-
-        // Remove existing buttons
+        
         var existingButtons = details.querySelectorAll('button');
         existingButtons.forEach(button => button.remove());
-
-        // Create buttons
+        
         var button1 = createElement('button', 'button-class', 'Add appointment');
         var button2 = createElement('button', 'button-class', 'Delete appointment');
 
         button1.addEventListener('click', function() {
             window.location.href = '/Appointments/Create';
         });
+
+        button2.addEventListener('click', function() {
+            var selectedEvent = document.querySelector('.event.selected');
+            if (selectedEvent) {
+                var eventName = selectedEvent.querySelector('span').innerText;
+                // Send a request to delete the appointment
+                fetch('/Appointments/Delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ eventName: eventName })
+                }).then(response => {
+                    if (response.ok) {
+                        // Remove the event from the UI
+                        selectedEvent.remove();
+                    } else {
+                        alert('Failed to delete the appointment.');
+                    }
+                });
+            } else {
+                alert('Please select an appointment to delete.');
+            }
+        });
         
-        // Append buttons to details
         details.appendChild(button1);
         details.appendChild(button2);
 

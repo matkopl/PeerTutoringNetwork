@@ -121,10 +121,11 @@ body {
     background: rgb(255, 255, 255);
     position: relative;
     z-index: 100;
+    border-radius: 3px;
 }
 
 .day.other {
-    color: rgb(255, 255, 255);
+    color: rgb(196, 193, 193);
     background: rgb(255, 255, 255);
 }
 
@@ -170,7 +171,7 @@ body {
 }
 
 .day.selected {
-    background-color: #bcf3ed; /* Change this to your desired color */
+    background-color: #bcf3c7;
 }
 
 .button-class {
@@ -188,10 +189,7 @@ body {
     background-color: #5CB85B;
 }
 
-.blue { background: rgba(156, 202, 235, 1); }
-.orange { background: rgba(247, 167, 0, 1); }
-.green { background: rgba(153, 198, 109, 1); }
-.yellow { background: rgba(249, 233, 0, 1); }
+.green { background: #5CB85B; }
 
 .details {
     position: relative;
