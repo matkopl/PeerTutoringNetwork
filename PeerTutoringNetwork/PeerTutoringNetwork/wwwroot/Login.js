@@ -32,7 +32,7 @@
                 console.log(roleId);
             }
             else if (roleId == 1) {
-                window.location.href = "Profile.html"; // Stavi StudentDashboard/Index MATKOOOOOO
+                window.location.href = "StudentDashboard/Index"; // Stavi StudentDashboard/Index MATKOOOOOO
                 console.log(roleId);
             }
             else {
