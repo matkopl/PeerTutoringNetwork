@@ -89,11 +89,9 @@ app.UseStaticFiles();
 app.UseAuthentication();
 
 app.UseAuthorization();
-app.UseDefaultFiles(new DefaultFilesOptions
-{
-    DefaultFileNames = new List<string> { "Login.html" }
-});
-app.UseStaticFiles();
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=MentorDashboard}/{action=Index}/{id?}");
 
 app.MapRazorPages();
 
