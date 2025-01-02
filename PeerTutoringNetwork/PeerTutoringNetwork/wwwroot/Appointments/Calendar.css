@@ -24,7 +24,7 @@ body {
     transform: translate3d(0, 0, 0);
     width: 1050px;
     margin: 0 auto;
-    height: 570px;
+    height: 670px;
     overflow: hidden;
 }
 
@@ -233,6 +233,10 @@ body {
     overflow-y: auto;
     overflow-x: hidden;
     background: rgb(241, 242, 245);
+}
+
+.event.selected {
+    background-color: #ffffff;
 }
 
 .events.in {

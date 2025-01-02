@@ -20,5 +20,17 @@
             @: { eventName: '@appointment.SubjectName session at @appointment.AppointmentDate.ToString("HH:mm") with @appointment.MentorUsername', calendar: 'Work', color: 'blue' },
         }
     ];
-    var calendar = new Calendar('#calendar', data);
+    var mockdata = [
+        { eventName: 'Math session at 10:00 with John Doe', calendar: 'Work', color: 'green' },
+            { eventName: 'Physics session at 11:00 with Jane Smith', calendar: 'Work', color: 'green' },
+            { eventName: 'Chemistry session at 12:00 with Alice Johnson', calendar: 'Work', color: 'green' },
+            { eventName: 'Biology session at 13:00 with Bob Brown', calendar: 'Work', color: 'green' },
+            { eventName: 'History session at 14:00 with Charlie Davis', calendar: 'Work', color: 'green' },
+            { eventName: 'Geography session at 15:00 with Eve White', calendar: 'Work', color: 'green' },
+            { eventName: 'English session at 16:00 with Frank Black', calendar: 'Work', color: 'green' },
+            { eventName: 'Spanish session at 17:00 with Grace Green', calendar: 'Work', color: 'green' },
+            { eventName: 'French session at 18:00 with Henry Blue', calendar: 'Work', color: 'green' },
+            { eventName: 'German session at 19:00 with Irene Red', calendar: 'Work', color: 'green' }
+    ];
+    var calendar = new Calendar('#calendar', mockdata);
 </script>

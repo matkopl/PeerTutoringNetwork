@@ -230,10 +230,10 @@
     }
 
     Calendar.prototype.renderEvents = function(events, ele) {
-        //Remove any events in the current details element
+        // Remove any events in the current details element
         var currentWrapper = ele.querySelector('.events');
         var wrapper = createElement('div', 'events in' + (currentWrapper ? ' new' : ''));
-        
+
         events.forEach(function(ev) {
             var div = createElement('div', 'event');
             var square = createElement('div', 'event-category ' + ev.color);
@@ -242,9 +242,17 @@
             div.appendChild(square);
             div.appendChild(span);
             wrapper.appendChild(div);
+
+            // Add event listener to make the appointment selectable
+            div.addEventListener('click', function() {
+                // Remove the 'selected' class from all events
+                document.querySelectorAll('.event').forEach(event => event.classList.remove('selected'));
+                // Add the 'selected' class to the clicked event
+                this.classList.add('selected');
+            });
         });
 
-        if(!events.length) {
+        if (!events.length) {
             var div = createElement('div', 'event empty');
             var span = createElement('span', '', 'No Events');
 
@@ -252,7 +260,7 @@
             wrapper.appendChild(div);
         }
 
-        if(currentWrapper) {
+        if (currentWrapper) {
             currentWrapper.className = 'events out';
             currentWrapper.addEventListener('webkitAnimationEnd', function() {
                 currentWrapper.parentNode.removeChild(currentWrapper);
@@ -274,6 +282,7 @@
             ele.appendChild(wrapper);
         }
     }
+    
 
     Calendar.prototype.drawLegend = function() {
         var legend = createElement('div', 'legend');
