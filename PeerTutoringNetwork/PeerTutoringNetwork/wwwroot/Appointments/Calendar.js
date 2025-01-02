@@ -130,6 +130,10 @@
         //Outer Day
         var outer = createElement('div', this.getDayClass(day));
         outer.addEventListener('click', function() {
+            // Remove the 'selected' class from all days
+            document.querySelectorAll('.day').forEach(d => d.classList.remove('selected'));
+            // Add the 'selected' class to the clicked day
+            this.classList.add('selected');
             self.openDay(this);
         });
 
@@ -183,37 +187,16 @@
 
         var currentOpened = document.querySelector('.details');
 
-        //Check to see if there is an open detais box on the current row
         if(currentOpened && currentOpened.parentNode === el.parentNode) {
             details = currentOpened;
             arrow = document.querySelector('.arrow');
         } else {
-            //Close the open events on differnt week row
-            //currentOpened && currentOpened.parentNode.removeChild(currentOpened);
             if(currentOpened) {
-                currentOpened.addEventListener('webkitAnimationEnd', function() {
-                    currentOpened.parentNode.removeChild(currentOpened);
-                });
-                currentOpened.addEventListener('oanimationend', function() {
-                    currentOpened.parentNode.removeChild(currentOpened);
-                });
-                currentOpened.addEventListener('msAnimationEnd', function() {
-                    currentOpened.parentNode.removeChild(currentOpened);
-                });
-                currentOpened.addEventListener('animationend', function() {
-                    currentOpened.parentNode.removeChild(currentOpened);
-                });
-                currentOpened.className = 'details out';
+                currentOpened.parentNode.removeChild(currentOpened);
             }
 
-            //Create the Details Container
             details = createElement('div', 'details in');
-
-            //Create the arrow
-            var arrow = createElement('div', 'arrow');
-
-            //Create the event wrapper
-
+            arrow = createElement('div', 'arrow');
             details.appendChild(arrow);
             el.parentNode.appendChild(details);
         }
@@ -227,6 +210,22 @@
 
         this.renderEvents(todaysEvents, details);
 
+        // Remove existing buttons
+        var existingButtons = details.querySelectorAll('button');
+        existingButtons.forEach(button => button.remove());
+
+        // Create buttons
+        var button1 = createElement('button', 'button-class', 'Add appointment');
+        var button2 = createElement('button', 'button-class', 'Delete appointment');
+
+        button1.addEventListener('click', function() {
+            window.location.href = '/Appointments/Create';
+        });
+        
+        // Append buttons to details
+        details.appendChild(button1);
+        details.appendChild(button2);
+
         arrow.style.left = el.offsetLeft - el.parentNode.offsetLeft + 27 + 'px';
     }
 
@@ -234,7 +233,7 @@
         //Remove any events in the current details element
         var currentWrapper = ele.querySelector('.events');
         var wrapper = createElement('div', 'events in' + (currentWrapper ? ' new' : ''));
-
+        
         events.forEach(function(ev) {
             var div = createElement('div', 'event');
             var square = createElement('div', 'event-category ' + ev.color);
