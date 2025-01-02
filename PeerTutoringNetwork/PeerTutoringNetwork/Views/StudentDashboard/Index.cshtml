@@ -1,0 +1,165 @@
+﻿@model PeerTutoringNetwork.Viewmodels.StudentDashboardVM
+
+@{
+    ViewData["Title"] = "Student Dashboard";
+    Layout = "_Layout";
+}
+
+<div class="container">
+    <h1 class="text-center"><i class="fas fa-user-graduate"></i> Student Dashboard</h1>
+
+    <!-- Quick Actions -->
+    <div class="row text-center mb-4">
+        <div class="col-md-6">
+            <button class="btn btn-primary" onclick="window.location.href='/Profile.html'">
+                <i class="fas fa-user"></i> View Profile
+            </button>
+        </div>
+        <div class="col-md-6">
+            <button class="btn btn-danger" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Reservations -->
+    <h3><i class="fas fa-calendar-check"></i> Your Reservations</h3>
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Appointment ID</th>
+                <th>Mentor</th>
+                <th>Subject</th>
+                <th>Date & Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var reservation in Model.Reservations)
+            {
+                <tr>
+                    <td>@reservation.AppointmentId</td>
+                    <td>@reservation.MentorUsername</td>
+                    <td>@reservation.</td>
+                    <td>@reservation.ReservationTime.ToString("yyyy-MM-dd HH:mm")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <hr>
+
+    <!-- Available Appointments -->
+    <h3><i class="fas fa-calendar-alt"></i> Available Appointments</h3>
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Appointment ID</th>
+                <th>Mentor</th>
+                <th>Subject</th>
+                <th>Date & Time</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var appointment in Model.AvailableAppointments)
+            {
+                <tr>
+                    <td>@appointment.AppointmentId</td>
+                    <td>@appointment.MentorUsername</td>
+                    <td>@appointment.SubjectName</td>
+                    <td>@appointment.AppointmentDate.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>
+                        <button class="btn btn-success" onclick="reserveAppointment(@appointment.AppointmentId)">
+                            <i class="fas fa-plus"></i> Reserve
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<script>
+    import jwtDecode from "jwt-decode";
+
+    // Dohvati token iz LocalStorage
+    const token = localStorage.getItem('jwtToken');
+    console.log(token);
+
+    if (!token) {
+        alert('You are not logged in!');
+        window.location.href = '/Login.html'; // Preusmjeri na login ako token nije prisutan
+    }
+
+    // Dekodiranje tokena i dohvaćanje userId
+    function getUserInfoFromToken(token) {
+        try {
+            const decoded = jwt_decode(token);
+            return { userId: decoded.userId, roleId: decoded.roleId };
+        } catch (error) {
+            console.error("Invalid token", error);
+            return null;
+        }
+    }
+    const userInfo = getUserInfoFromToken(token);
+    if (!userInfo) {
+        alert('Invalid session. Please log in again.');
+        window.location.href = '/Login.html';
+    }
+
+    const userId = userInfo.userId;
+
+    function fetchaj() {
+        fetch(`/api/StudentDashboard/Index?userId=${userInfo.userId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to clear optional data');
+                alert('Optional data cleared successfully');
+                fetchProfile();
+            })
+            .catch(error => console.error('Error clearing optional data:', error));
+    }
+
+    function fetchProfile() {
+        fetch('/api/User/GetProfile', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
+            }
+        })
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to fetch profile');
+                return response.json();
+            })
+            .then(data => {// Popuni formu s podacima korisnika
+                document.getElementById('username').value = data.username;
+                document.getElementById('firstName').value = data.firstName;
+                document.getElementById('lastName').value = data.lastName;
+                document.getElementById('email').value = data.email;
+                document.getElementById('phone').value = data.phone;
+            })
+            .catch(error => console.error('Error fetching profile:', error));
+    }
+
+
+
+
+    function reserveAppointment(appointmentId) {
+        const token = localStorage.getItem('jwtToken');
+        fetch(`/api/Reservations/ReserveAppointment/${appointmentId}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to reserve appointment');
+            alert('Appointment reserved successfully!');
+            location.reload(); // Reload to update reservations
+        })
+        .catch(error => console.error('Error reserving appointment:', error));
+    }
+</script>

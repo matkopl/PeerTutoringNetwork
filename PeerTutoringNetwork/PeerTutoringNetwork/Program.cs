@@ -89,9 +89,20 @@ app.UseStaticFiles();
 app.UseAuthentication();
 
 app.UseAuthorization();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=MentorDashboard}/{action=Index}/{id?}");
+
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path == "/")
+    {
+        context.Response.Redirect("/Login.html");
+        return;
+    }
+    await next();
+});
 
 app.MapRazorPages();
 
