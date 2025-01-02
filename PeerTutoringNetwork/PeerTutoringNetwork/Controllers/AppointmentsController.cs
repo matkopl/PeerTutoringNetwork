@@ -191,5 +191,10 @@ namespace PeerTutoringNetwork.Controllers
             return View(appointmentVM);
         }
 
+        public IActionResult Calendar()
+        {
+            return View(new List<AppointmentVM>());
+        }
+
     }
 }
