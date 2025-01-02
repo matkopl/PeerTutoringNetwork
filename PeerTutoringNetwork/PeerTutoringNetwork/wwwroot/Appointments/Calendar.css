@@ -22,7 +22,7 @@ body {
     -webkit-transform: translate3d(0, 0, 0);
     -moz-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
-    width: 850px;
+    width: 1050px;
     margin: 0 auto;
     height: 570px;
     overflow: hidden;
@@ -30,9 +30,10 @@ body {
 
 .header {
     height: 50px;
-    width: 850px;
-    background: rgb(140, 182, 218);
+    width: 1050px;
+    background: rgb(34, 34, 34);
     text-align: center;
+    color: white;
     position:relative;
     z-index: 100;
 }
@@ -112,18 +113,19 @@ body {
 
 .day {
     display: inline-block;
-    width: 120px;
+    width: 150px;
     padding: 10px;
     text-align: center;
     vertical-align: top;
     cursor: pointer;
-    background: #faf4f4;
+    background: rgb(255, 255, 255);
     position: relative;
     z-index: 100;
 }
 
 .day.other {
-    color: rgba(67, 19, 180, 0.3);
+    color: rgb(255, 255, 255);
+    background: rgb(255, 255, 255);
 }
 
 .day.today {
@@ -175,9 +177,9 @@ body {
 
 .details {
     position: relative;
-    width: 850px;
+    width: 1050px;
     height: 75px;
-    background: #DAE8F5;
+    background: #ffffff;
     margin-top: 5px;
     border-radius: 4px;
 }
@@ -203,7 +205,7 @@ body {
     height: 0px;
     border-style: solid;
     border-width: 0 5px 5px 5px;
-    border-color: transparent transparent #8CB6DA transparent;
+    border-color: transparent transparent #222222 transparent;
     transition: all 0.7s ease;
 }
 
@@ -212,7 +214,7 @@ body {
     padding: 7px 0;
     overflow-y: auto;
     overflow-x: hidden;
-    background: rgb(218, 232, 245);
+    background: rgb(241, 242, 245);
 }
 
 .events.in {
