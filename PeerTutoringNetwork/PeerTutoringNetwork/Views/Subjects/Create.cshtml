@@ -21,11 +21,7 @@
         <div class="form-group">
             <label asp-for="Description"><i class="fas fa-align-left"></i> Description</label>
             <textarea asp-for="Description" class="form-control" placeholder="Enter subject description"></textarea>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="CreatedByUserId"><i class="fas fa-user"></i> Created By</label>
-            <select asp-for="CreatedByUserId" class="form-control" asp-items="ViewBag.CreatedByUserId"></select>
+            <span asp-validation-for="Description" class="text-danger"></span>
         </div>
 
         <div class="mt-3">

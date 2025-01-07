@@ -5,6 +5,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using BL.Models;
+using BL.Services;
+using BL.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,6 +50,9 @@ builder.Services.AddSwaggerGen(option =>
 builder.Services.AddDbContext<PeerTutoringNetworkContext>(options => {
     options.UseSqlServer("Name=ConnectionStrings:PeerTutoringNetworkConnStr");
 });
+
+builder.Services.AddScoped<ISubjectService, SubjectService>(); 
+
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 builder.Services.AddHttpClient();
 
