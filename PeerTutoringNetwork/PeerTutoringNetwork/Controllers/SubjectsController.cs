@@ -27,7 +27,6 @@ namespace PeerTutoringNetwork.Controllers
         // GET: Subjects/Create
         public async Task<IActionResult> Create()
         {
-            // Hardcoded users until UserService is implemented
             var users = new List<User>
             {
                 new User { UserId = 15, Username = "MainUser" }
@@ -44,14 +43,12 @@ namespace PeerTutoringNetwork.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Set CreatedByUserId to hardcoded UserId (15)
                 subjectVM.CreatedByUserId = 15;
 
                 var success = await _subjectService.CreateSubjectAsync(subjectVM);
                 if (success) return RedirectToAction(nameof(Index));
             }
 
-            // Repopulate dropdown in case of failure
             var users = new List<User>
             {
                 new User { UserId = 15, Username = "MainUser" }
@@ -69,7 +66,6 @@ namespace PeerTutoringNetwork.Controllers
             var subject = await _subjectService.GetSubjectByIdAsync(id.Value);
             if (subject == null) return NotFound();
 
-            // Hardcoded users for the dropdown
             var users = new List<User>
             {
                 new User { UserId = 15, Username = "MainUser" }
@@ -92,7 +88,6 @@ namespace PeerTutoringNetwork.Controllers
                 if (success) return RedirectToAction(nameof(Index));
             }
 
-            // Repopulate dropdown in case of failure
             var users = new List<User>
             {
                 new User { UserId = 15, Username = "MainUser" }
