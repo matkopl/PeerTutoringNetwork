@@ -12,12 +12,12 @@
 <h2>My calendar</h2>
 <div id="calendar"></div>
 <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js"></script>
-<script src="./Calendar.js"></script>
-<script>
+<script type="module">
+import { Calendar } from './Calendar.js';
     var data = [
         @foreach (var appointment in Model)
         {
-            @: { eventName: '@appointment.SubjectName session at @appointment.AppointmentDate.ToString("HH:mm") with @appointment.MentorUsername', calendar: 'Work', color: 'blue' },
+            @: { eventName: '@appointment.SubjectName session at @appointment.AppointmentDate.ToString("HH:mm") with @appointment.MentorUsername', calendar: 'Work', color: 'green', date: "@appointment.AppointmentDate.ToString("o")" },
         }
     ];
     var mockdata = [
@@ -32,5 +32,6 @@
             { eventName: 'French session at 18:00 with Henry Blue', calendar: 'Work', color: 'green' },
             { eventName: 'German session at 19:00 with Irene Red', calendar: 'Work', color: 'green' }
     ];
-    var calendar = new Calendar('#calendar', mockdata);
+    // TODO  Liskov Substitution Principle
+    var calendar = new Calendar('#calendar', data);
 </script>

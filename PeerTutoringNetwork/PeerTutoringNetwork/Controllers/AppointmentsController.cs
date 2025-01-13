@@ -11,10 +11,12 @@ namespace PeerTutoringNetwork.Controllers
     public class AppointmentsController : Controller
     {
         private readonly PeerTutoringNetworkContext _context;
-
-        public AppointmentsController(PeerTutoringNetworkContext context)
+        private readonly IAppointmentService _appointmentService;
+        // TODO  Dependency Inversion Principle 
+        public AppointmentsController(PeerTutoringNetworkContext context, IAppointmentService appointmentService)
         {
             _context = context;
+            _appointmentService = appointmentService;
         }
 
         // GET: Appointments
@@ -154,13 +156,7 @@ namespace PeerTutoringNetwork.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var appointment = await _context.Appointments.FindAsync(id);
-            if (appointment != null)
-            {
-                _context.Appointments.Remove(appointment);
-                await _context.SaveChangesAsync();
-            }
-
+            var success = await _appointmentService.DeleteAppointment(id);
             return RedirectToAction(nameof(Index));
         }
 
@@ -191,9 +187,19 @@ namespace PeerTutoringNetwork.Controllers
             return View(appointmentVM);
         }
 
-        public IActionResult Calendar()
+        public async Task<IActionResult> Calendar()
         {
-            return View(new List<AppointmentVM>());
+            var appointments = await _appointmentService.GetAppointments();
+            var avm = appointments.Select(a => new AppointmentVM
+            {
+                AppointmentId = a.AppointmentId,
+                MentorId = a.MentorId,
+                SubjectId = a.SubjectId,
+                MentorUsername = a.Mentor.Username,
+                SubjectName = a.Subject.SubjectName,
+                AppointmentDate = a.AppointmentDate
+            }).ToList();
+            return View(avm);
         }
 
     }
