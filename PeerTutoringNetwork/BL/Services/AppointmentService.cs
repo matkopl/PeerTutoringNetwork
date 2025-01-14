@@ -29,7 +29,6 @@ public class AppointmentService : IAppointmentService
         return appointments;
     }
 
-    // TODO  Single Responsibility Principle
     public async Task<bool> DeleteAppointment(int id)
     {
         var appointment = await _context.Appointments.FindAsync(id);
