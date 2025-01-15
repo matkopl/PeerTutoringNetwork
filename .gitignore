@@ -400,3 +400,4 @@ FodyWeavers.xsd
 .idea
 appsettings.json
 .DS_Store
+fillDatabase.sql
