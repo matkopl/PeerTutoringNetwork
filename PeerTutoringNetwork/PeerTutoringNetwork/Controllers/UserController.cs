@@ -7,6 +7,7 @@ using NuGet.Common;
 using PeerTutoringNetwork.DTO;
 using PeerTutoringNetwork.DTOs;
 using PeerTutoringNetwork.Security;
+using PeerTutoringNetwork.Viewmodels;
 
 namespace PeerTutoringNetwork.Controllers
 {
@@ -260,6 +261,7 @@ namespace PeerTutoringNetwork.Controllers
             }
 
         }
+
         [HttpPost("[action]")]
         public ActionResult AddUser(UserRegisterDto userDto)
         {
@@ -331,7 +333,6 @@ namespace PeerTutoringNetwork.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-
     }
 }
 

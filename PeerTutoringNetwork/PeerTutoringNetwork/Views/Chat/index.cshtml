@@ -1,0 +1,57 @@
+@model IEnumerable<PeerTutoringNetwork.Viewmodels.UserVM>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+    <div id="userList">
+        <table>
+            <thead>
+                <tr>
+                    <th>User Name</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="usersTableBody">
+                <!-- Users will be populated here by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            fetchUsers();
+
+            function fetchUsers() {
+                $.ajax({
+                    url: '@Url.ActionLink("FetchAllUsersForChat","Chat")',
+                    method: 'GET',
+                    success: function(data) {
+                        var usersTableBody = $('#usersTableBody');
+                        usersTableBody.empty();
+                        data.forEach(function(user) {
+                            usersTableBody.append(
+                                '<tr>' +
+                                    '<td>' + user.userName + '</td>' +
+                                    '<td>' +
+                                        '<form asp-controller="Chat" asp-action="SendMessage" method="post">' +
+                                            '<input type="hidden" name="userId" value="' + user.userId + '" />' +
+                                            '<button type="submit">Message</button>' +
+                                        '</form>' +
+                                    '</td>' +
+                                '</tr>'
+                            );
+                        });
+                    },
+                    error: function(error) {
+                        console.error('Error fetching users:', error);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

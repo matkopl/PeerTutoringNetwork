@@ -5,12 +5,17 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using BL.Models;
+using BL.Services;
+using BL.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+builder.Services.AddScoped<IChatService, ChatService>();
+
+builder.Services.AddSignalR();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -95,6 +100,8 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=MentorDashboard}/{action=Index}/{id?}");
+
+app.MapHub<ChatHub>("/chatHub");
 
 app.Use(async (context, next) =>
 {
