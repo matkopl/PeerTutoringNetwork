@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace BL.Class
-{//
+{// 5. Strategy pattern -- ovo je Strategy pattern jer se koristi za izvršavanje različitih akcija
     public class UserContext
     {
         private IUserActionStrategy _strategy;

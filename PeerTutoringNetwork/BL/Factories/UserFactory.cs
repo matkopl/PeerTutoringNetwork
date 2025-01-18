@@ -17,7 +17,7 @@ namespace BL.Factories
                 3 => new AdminUser(),
                 2 => new TeacherUser(),
                 1 => new StudentUser(),
-                _ => throw new ArgumentException("Invalid role type")
+                _ => throw new ArgumentException("Invalid role Id")
             };
         }
     }

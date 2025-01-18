@@ -9,6 +9,7 @@ using BL.Models;
 using PeerTutoringNetwork.DTOs;
 using PeerTutoringNetwork.Security;
 using BL.Factories;
+using BL.Class;
 
 namespace PeerTutoringNetwork.Controllers
 { // 2. Factory pattern -- ovo je Factory pattern jer se koristi za instanciranje objekata u metodi AddUser
@@ -59,6 +60,20 @@ namespace PeerTutoringNetwork.Controllers
             }
         }
 
+        [HttpGet("[action]")]
+        public IActionResult ExecuteUserAction(int userId, int roleId)
+        {
+            try
+            {
+                var demo = new StrategyPatternRoles(_context);
+                demo.Run(userId, roleId);
+                return Ok("Action executed successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
         // GET: Users
         public async Task<IActionResult> Index()
         {
