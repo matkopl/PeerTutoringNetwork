@@ -27,7 +27,14 @@ public class ChatController : Controller
         return Ok();
     }
 
+    [HttpGet("index")]
     public IActionResult Index()
+    {
+        return View();
+    }
+    
+    [HttpGet("Chat")]
+    public IActionResult Chat()
     {
         return View();
     }
