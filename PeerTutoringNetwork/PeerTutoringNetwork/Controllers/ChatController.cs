@@ -1,5 +1,7 @@
+using System.Security.Claims;
 using BL.Models;
 using BL.Services;
+using Microsoft.EntityFrameworkCore;
 using PeerTutoringNetwork.Viewmodels;
 
 namespace PeerTutoringNetwork.Controllers;
@@ -12,12 +14,14 @@ using System.Threading.Tasks;
 public class ChatController : Controller
 {
     private readonly IChatService _chatService;
+    private readonly IUserService _userService;
     private readonly PeerTutoringNetworkContext _context;
 
-    public ChatController(IChatService chatService, PeerTutoringNetworkContext context)
+    public ChatController(IChatService chatService, PeerTutoringNetworkContext context, IUserService userService)
     {
         _chatService = chatService;
         _context = context;
+        _userService = userService;
     }
 
     [HttpPost("send")]
@@ -32,11 +36,25 @@ public class ChatController : Controller
     {
         return View();
     }
-    
+
     [HttpGet("Chat")]
-    public IActionResult Chat()
+    [HttpGet("Chat/{selectedUserId}")]
+    public async Task<IActionResult> Chat(int selectedUserId)
     {
-        return View();
+        var user = await _userService.GetUserById(selectedUserId);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        var userVM = new UserVM
+        {
+            UserId = user.UserId.ToString(),
+            UserName = user.Username,
+            Role = user.RoleId
+        };
+
+        return View(userVM);
     }
 
     [HttpGet("FetchAllUsersForChat")]
@@ -52,8 +70,8 @@ public class ChatController : Controller
             .ToList();
         return Ok(users);
     }
-    
-    
+
+
     [HttpGet("GetRoleById/{id}")]
     public IActionResult GetRoleById(int id)
     {
@@ -73,9 +91,26 @@ public class ChatController : Controller
 
         return Ok(role);
     }
+
+    [HttpGet]
+    public async Task<IActionResult> GetUserVMById(int userId)
+    {
+        var user = await _userService.GetUserById(userId);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        var userVM = new UserVM
+        {
+            UserId = user.UserId.ToString(),
+            UserName = user.Username,
+            Role = user.RoleId
+        };
+
+        return Json(userVM);
+    }
 }
-
-
 
 public class ChatMessage
 {

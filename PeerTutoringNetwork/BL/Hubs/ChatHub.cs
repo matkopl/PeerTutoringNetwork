@@ -8,4 +8,10 @@ namespace BL.Hubs;
         {
             await Clients.All.SendAsync("ReceiveMessage", user, message);
         }
+        public override Task OnConnectedAsync()
+        {
+            Console.WriteLine($"Client {Context.ConnectionId} connected");
+            Clients.All.SendAsync("ReceiveMessage", $"{Context.ConnectionId} has joined");
+            return base.OnConnectedAsync();
+        }
     }
