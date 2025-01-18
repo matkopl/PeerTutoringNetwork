@@ -39,12 +39,36 @@ public class ChatController : Controller
             .Select(user => new UserVM
             {
                 UserId = user.UserId.ToString(),
-                UserName = user.Username
+                UserName = user.Username,
+                Role = user.RoleId
             })
             .ToList();
         return Ok(users);
     }
+    
+    
+    [HttpGet("GetRoleById/{id}")]
+    public IActionResult GetRoleById(int id)
+    {
+        var role = _context.Roles
+            .Where(r => r.RoleId == id)
+            .Select(r => new
+            {
+                r.RoleId,
+                r.RoleName
+            })
+            .FirstOrDefault();
+
+        if (role == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(role);
+    }
 }
+
+
 
 public class ChatMessage
 {
