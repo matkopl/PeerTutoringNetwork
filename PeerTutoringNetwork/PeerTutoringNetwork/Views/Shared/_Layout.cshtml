@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Peer Tutoring Network</title>
 
-    <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
+    <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"></link>
 
     <script src="https://kit.fontawesome.com/d185203d23.js" crossorigin="anonymous"></script>
 </head>
@@ -26,6 +26,7 @@
                     <li><a href="/MentorDashboard/Index">Home</a></li>
                     <li><a href="/Appointments">Appointments</a></li>
                     <li><a href="@Url.ActionLink("Calendar", "Appointments")">Calendar</a></li>
+                    <li><a href="@Url.Action("Index", "Chat")">Chat</a></li>
                     <li><a href="/Subjects">Subjects</a></li>
                 </ul>
             </div>

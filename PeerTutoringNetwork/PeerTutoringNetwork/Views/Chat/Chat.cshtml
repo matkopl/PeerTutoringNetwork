@@ -1,0 +1,140 @@
+@model PeerTutoringNetwork.Viewmodels.UserVM
+
+<link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
+
+@{
+    ViewData["Title"] = "Chat";
+    Layout = "_Layout";
+}
+
+<div class="chat-container">
+    <div class="chat-header">Chat with @Model.UserName</div>
+    <div id="messagesList" class="messages-list"></div>
+    <div class="message-input">
+        <input type="text" id="messageInput" placeholder="Your message" />
+        <button id="sendButton">Send</button>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    const token = localStorage.getItem('jwtToken');
+
+    if (token) {
+        const decodedToken = jwt_decode(token);
+        const userId = decodedToken.userId;
+
+        $.ajax({
+            url: '@Url.Action("GetUserVMById", "Chat")?userId=' + userId,
+            method: 'GET',
+            success: function(data) {
+                console.log('User:', data);
+                $('#currentUserLabel').text('Current User: ' + data.userName);
+            },
+            error: function(error) {
+                console.error('Error fetching user:', error);
+                $('#currentUserLabel').text('Error fetching user');
+            }
+        });
+    } else {
+        $('#currentUserLabel').text('No token found');
+    }
+
+    // SignalR connection setup
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/chathub")
+        .build();
+
+    connection.on("ReceiveMessage", function(user, message) {
+        const displayName = user === "@Model.UserName" ? 'me' : user;
+        const msg = $('<div>').addClass('message').addClass(user === "@Model.UserName" ? 'me' : 'other').text(displayName + ": " + message);
+        $('#messagesList').append(msg);
+    });
+
+    connection.start().catch(function(err) {
+        return console.error(err.toString());
+    });
+
+    $('#sendButton').click(function() {
+        const message = $('#messageInput').val();
+        connection.invoke("SendMessage", "@Model.UserName", message).catch(function(err) {
+            return console.error(err.toString());
+        });
+        $('#messageInput').val('');
+    });
+});
+</script>
+
+<style>
+
+.chat-container {
+           max-width: 600px;
+           margin: 0 auto;
+           padding: 20px;
+           border: 1px solid #ccc;
+           border-radius: 10px;
+           background-color: #f9f9f9;
+       }
+       
+       .chat-header {
+           font-size: 24px;
+           font-weight: bold;
+           margin-bottom: 20px;
+           text-align: center;
+       }
+       
+       .messages-list {
+           height: 400px;
+           overflow-y: auto;
+           border: 1px solid #ccc;
+           border-radius: 10px;
+           padding: 10px;
+           background-color: #fff;
+       }
+       
+       .message {
+           margin-bottom: 10px;
+           padding: 10px;
+           border-radius: 10px;
+       }
+       
+       .message.me {
+           background-color: #d1e7dd;
+           text-align: right;
+       }
+       
+       .message.other {
+           background-color: #a5e5f5;
+           text-align: left;
+       }
+       
+       .message-input {
+           display: flex;
+           margin-top: 20px;
+       }
+       
+       .message-input input {
+           flex: 1;
+           padding: 10px;
+           border: 1px solid #ccc;
+           border-radius: 10px;
+           margin-right: 10px;
+       }
+       
+       .message-input button {
+           padding: 10px 20px;
+           border: none;
+           border-radius: 10px;
+           background-color: #007bff;
+           color: #fff;
+           cursor: pointer;
+       }
+       
+       .message-input button:hover {
+           background-color: #0056b3;
+       }
+       
+</style>
