@@ -10,6 +10,7 @@ public interface IUserService
 
 public class UserService : IUserService
 {
+    // TODO Repository Pattern 
     private readonly PeerTutoringNetworkContext _context;
 
     public UserService(PeerTutoringNetworkContext context)
