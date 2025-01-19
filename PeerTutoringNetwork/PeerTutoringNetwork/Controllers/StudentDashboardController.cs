@@ -1,10 +1,9 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using PeerTutoringNetwork.Viewmodels;
 using BL.Models;
-using PeerTutoringNetwork.DTO;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace PeerTutoringNetwork.Controllers
 {
@@ -19,77 +18,23 @@ namespace PeerTutoringNetwork.Controllers
             _logger = logger;
         }
 
-        //private int? GetCurrentUserId()
-        //{
-        //    try
-        //    {
-        //        var token = HttpContext.Request.Cookies["jwtToken"];
-        //
-        //        var handler = new JwtSecurityTokenHandler();
-        //        if (!handler.CanReadToken(token))
-        //        {
-        //            _logger.LogWarning("Unable to read JWT token.");
-        //            return null;
-        //        }
-        //
-        //        var jwtToken = handler.ReadJwtToken(token);
-        //
-        //        var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "userId");
-        //        if (userIdClaim != null && int.TryParse(userIdClaim.Value, out var userId))
-        //        {
-        //            return userId;
-        //        }
-        //
-        //        _logger.LogWarning("UserId claim not found in the token.");
-        //        return null;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError($"Error decoding JWT token: {ex.Message}");
-        //        return null;
-        //    }
-        //}
-
-        [HttpGet("[action]/{userId}")]
-        public ActionResult GetUserById(int userId)
-        {
-            try
-            {
-                // Dohvati korisnika prema userId
-                var user = _context.Users
-                    .Where(u => u.UserId == userId)
-                    .Select(u => new UserProfileDto
-                    {
-                        UserId = u.UserId,
-                        Username = u.Username,
-                        Email = u.Email,
-                        FirstName = u.FirstName,
-                        LastName = u.LastName,
-                        Phone = u.Phone,
-                        RoleId = u.RoleId
-                    })
-                    .FirstOrDefault();
-
-                if (user == null)
-                {
-                    return NotFound("User not found");
-                }
-
-                return Ok(user);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-
-
-
         public async Task<IActionResult> Index()
         {
-           var userId = _context.Users.Select(u => u.UserId).FirstOrDefault();
-            // Fetch student reservations
+            var token = Request.Query["jwtToken"];
+            if (string.IsNullOrEmpty(token))
+            {
+                _logger.LogWarning("Token is missing in the request.");
+                return Redirect("/Login.html");
+            }
+
+            var userId = ExtractUserIdFromToken(token); // Implement your JWT decoding here
+
+            if (userId == null)
+            {
+                _logger.LogWarning("Invalid token.");
+                return Unauthorized();
+            }
+
             var reservations = await _context.AppointmentReservations
                 .Include(r => r.Appointment)
                 .ThenInclude(a => a.Mentor)
@@ -98,13 +43,13 @@ namespace PeerTutoringNetwork.Controllers
                 .Select(r => new ReservationVM
                 {
                     ReservationId = r.ReservationId,
-                    StudentName = r.Student.Username,
-                    ReservationTime = r.ReservationTime ?? DateTime.Now,
-                    AppointmentDetails = $"{r.Appointment.Subject.SubjectName} - {r.Appointment.Mentor.Username} at {r.Appointment.AppointmentDate:yyyy-MM-dd HH:mm}"
+                    AppointmentId = r.AppointmentId,
+                    MentorUsername = r.Appointment.Mentor.Username,
+                    SubjectName = r.Appointment.Subject.SubjectName,
+                    ReservationTime = r.ReservationTime ?? DateTime.Now
                 })
                 .ToListAsync();
 
-            // Fetch available appointments
             var availableAppointments = await _context.Appointments
                 .Include(a => a.Mentor)
                 .Include(a => a.Subject)
@@ -120,7 +65,6 @@ namespace PeerTutoringNetwork.Controllers
                 })
                 .ToListAsync();
 
-            // Combine data into a single view model
             var dashboardVM = new StudentDashboardVM
             {
                 Reservations = reservations,
@@ -128,6 +72,26 @@ namespace PeerTutoringNetwork.Controllers
             };
 
             return View(dashboardVM);
+        }
+
+        private int? ExtractUserIdFromToken(string token)
+        {
+            // Decode the JWT token to extract userId
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+                var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "userId");
+                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out var userId))
+                {
+                    return userId;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to decode token: {ex.Message}");
+            }
+            return null;
         }
     }
 }
