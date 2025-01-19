@@ -158,8 +158,22 @@ namespace PeerTutoringNetwork.Controllers
                 _context.Users.Add(user);
                 _context.SaveChanges();
 
-                // Vraćamo JSON s porukom i korisnikom
-                return Ok(new { message = "User added successfully", user });
+                var response = new
+                {
+                    message = "User added successfully",
+                    user = new
+                    {
+                        user.UserId,
+                        user.Username,
+                        user.Email,
+                        user.FirstName,
+                        user.LastName,
+                        user.Phone,
+                        user.RoleId
+                    }
+                };
+
+                return Ok(response);
             }
             catch (Exception ex)
             {
