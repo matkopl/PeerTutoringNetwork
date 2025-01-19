@@ -162,14 +162,26 @@ namespace PeerTutoringNetwork.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var appointmentReservation = await _context.AppointmentReservations.FindAsync(id);
-            if (appointmentReservation != null)
+            var reservation = await _context.AppointmentReservations
+                .Include(r => r.Appointment) // Include related appointment
+                .FirstOrDefaultAsync(r => r.ReservationId == id);
+
+            if (reservation == null)
             {
-                _context.AppointmentReservations.Remove(appointmentReservation);
+                return NotFound("Reservation not found.");
             }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                _context.AppointmentReservations.Remove(reservation);
+                await _context.SaveChangesAsync();
+
+                return Ok("Reservation canceled successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         private bool AppointmentReservationExists(int id)
