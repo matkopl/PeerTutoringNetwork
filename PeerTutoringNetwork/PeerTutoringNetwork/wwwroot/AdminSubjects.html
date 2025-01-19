@@ -1,0 +1,67 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subject Management</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <!-- Navigacijska traka -->
+    <nav class="navbar">
+        <div class="navbar-logo">Admin Dashboard</div>
+        <ul class="nav-left">
+            <li><a href="Admin.html">UserManager</a></li>
+            <li><a href="AdminSubjects.html">SubjectManager</a></li>
+            <li><a href="AdminStatistics.html">Statistika</a></li>
+            <li><a href="Profile.html">Profile Page</a></li>
+        </ul>
+        <ul class="nav-right">
+            <li><a href="/Login.html" onclick="logout()">Logout</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <!-- Statistika subjekata -->
+        <section class="subject-management">
+            <div class="header">
+                <h2>Subject Management</h2>
+            </div>
+            <table id="subject-table" class="user-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dinamički popunjavanje subjekata -->
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Forma za dodavanje subjekta -->
+        <!-- <section id="add-subject-form" class="form-container hidden">-->
+        <h2>Add Subject</h2>
+        <form onsubmit="addSubject(event)">
+            <div class="form-group">
+                <label for="subject-name">Subject Name:</label>
+                <input type="text" id="subject-name" required>
+            </div>
+            <div class="form-group">
+                <label for="subject-description">Description:</label>
+                <textarea id="subject-description" required></textarea>
+            </div>
+            <div class="form-buttons">
+                <button class="btn-primary" type="submit">Save</button>
+                <button class="btn-secondary" type="button" onclick="hideSubjectForm()">Cancel</button>
+            </div>
+        </form>
+        <!-- </section>-->
+    </main>
+
+        <script src="adminSubjects.js"></script>
+    </body>
+    </html>
