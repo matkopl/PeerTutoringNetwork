@@ -22,7 +22,7 @@ namespace Tests.AntonioTest.Service
             var session = sessionManager.GetSession(userId);
 
             // Assert
-            Assert.Null(session); // The session should be removed
+            Assert.Null(session); 
         }
 
         [Fact]
@@ -33,7 +33,7 @@ namespace Tests.AntonioTest.Service
             var instance2 = SessionManager.Instance;
 
             // Assert
-            Assert.Same(instance1, instance2); // They should be the same instance
+            Assert.Same(instance1, instance2); 
         }
 
         [Fact]
@@ -47,11 +47,11 @@ namespace Tests.AntonioTest.Service
 
             // Act
             sessionManager.AddSession(userId, token1);
-            sessionManager.AddSession(userId, token2); // Attempt to overwrite
+            sessionManager.AddSession(userId, token2); 
 
             // Assert
             var session = sessionManager.GetSession(userId);
-            Assert.Equal(token1, session); // The session should not be overwritten
+            Assert.Equal(token1, session); 
         }
 
         [Fact]
@@ -68,7 +68,7 @@ namespace Tests.AntonioTest.Service
             // Assert
             Assert.Contains(1, activeUsers);
             Assert.Contains(2, activeUsers);
-            Assert.Equal(2, activeUsers.Count); // There should be 2 active users
+            Assert.Equal(2, activeUsers.Count);
         }
     }
 }

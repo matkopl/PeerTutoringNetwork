@@ -15,10 +15,10 @@ namespace Tests.AntonioTest.Service
 
         public ReviewServiceTests()
         {
-            // Initialize the mock repository
+           
             _reviewRepositoryMock = new Mock<IReviewRepository>();
 
-            // Initialize the service with the mocked repository
+            
             _reviewService = new ReviewService(_reviewRepositoryMock.Object);
         }
 
@@ -41,7 +41,6 @@ namespace Tests.AntonioTest.Service
             Assert.Equal(expectedReview.Rating, result.Rating);
             Assert.Equal(expectedReview.Comment, result.Comment);
 
-            // Verify that the repository method was called once
             _reviewRepositoryMock.Verify(r => r.GetReviewById(reviewId), Times.Once);
         }
 
@@ -67,7 +66,6 @@ namespace Tests.AntonioTest.Service
             Assert.Equal(allReviews[0].ReviewId, result.First().ReviewId);
             Assert.Equal(allReviews[1].ReviewId, result.Last().ReviewId);
 
-            // Verify that the repository method was called once
             _reviewRepositoryMock.Verify(r => r.GetAllReviews(), Times.Once);
         }
 
@@ -94,7 +92,6 @@ namespace Tests.AntonioTest.Service
             Assert.Equal(reviewsForSubject[0].ReviewId, result.First().ReviewId);
             Assert.Equal(reviewsForSubject[1].ReviewId, result.Last().ReviewId);
 
-            // Verify that the repository method was called once
             _reviewRepositoryMock.Verify(r => r.GetReviewsBySubjectId(subjectId), Times.Once);
         }
 
@@ -121,7 +118,6 @@ namespace Tests.AntonioTest.Service
             Assert.Equal(reviewsForUser[0].ReviewId, result.First().ReviewId);
             Assert.Equal(reviewsForUser[1].ReviewId, result.Last().ReviewId);
 
-            // Verify that the repository method was called once
             _reviewRepositoryMock.Verify(r => r.GetReviewsByUserId(userId), Times.Once);
         }
 

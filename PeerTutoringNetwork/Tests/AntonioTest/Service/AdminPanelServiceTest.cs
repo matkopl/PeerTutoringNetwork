@@ -19,24 +19,24 @@ namespace Tests.AntonioTest.Service
 
         public AdminPanelServiceTests()
         {
-            // Mock the dependencies
+           
             _contextMock = new Mock<PeerTutoringNetworkContext>();
             _sessionManagerMock = new Mock<SessionManager>();
             _jwtTokenProviderMock = new Mock<JwtTokenProvider>();
 
-            // Create an instance of the AdminPanelService
+           
             _adminPanelService = new AdminPanelService(_contextMock.Object);
 
-            // Create a dummy user for authentication
+          
             _user = new User
             {
                 UserId = 1,
                 Username = "testUser",
-                PwdHash = new byte[] { 1, 2, 3, 4 },  // Simulate hashed password
+                PwdHash = new byte[] { 1, 2, 3, 4 },  
                 PwdSalt = new byte[] { 5, 6, 7, 8 }
             };
 
-            // Mock DbSet<User>
+           
             var users = new List<User> { _user }.AsQueryable();
             var usersDbSet = new Mock<DbSet<User>>();
             usersDbSet.As<IQueryable<User>>().Setup(m => m.Provider).Returns(users.Provider);
@@ -58,8 +58,8 @@ namespace Tests.AntonioTest.Service
             var result = _adminPanelService.Authenticate(_user.Username, invalidPassword, out var authenticatedUser);
 
             // Assert
-            Assert.False(result);  // Check that authentication failed
-            Assert.Null(authenticatedUser);  // Ensure no user is authenticated
+            Assert.False(result);  
+            Assert.Null(authenticatedUser); 
         }
     }
 }

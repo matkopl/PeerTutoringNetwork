@@ -17,14 +17,14 @@ namespace Tests.AntonioTest.Repo
 
         public ReviewRepositoryTests()
         {
-            // Mock the DbSet<Review>
+            
             _dbSetMock = new Mock<DbSet<Review>>();
 
-            // Mock the context
+           
             _contextMock = new Mock<PeerTutoringNetworkContext>();
             _contextMock.Setup(c => c.Reviews).Returns(_dbSetMock.Object);
 
-            // Instantiate the ReviewRepository with the mocked context
+         
             _reviewRepository = new ReviewRepository(_contextMock.Object);
         }
 

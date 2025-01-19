@@ -15,10 +15,10 @@ namespace Tests.AntonioTest.Repo
 
         public DecoratedReviewRepositoryTests()
         {
-            // Mock the inner IReviewRepository
+           
             _innerRepositoryMock = new Mock<IReviewRepository>();
 
-            // Instantiate the DecoratedReviewRepository with the mocked inner repository
+       
             _decoratedRepository = new DecoratedReviewRepository(_innerRepositoryMock.Object);
         }
 
@@ -35,7 +35,7 @@ namespace Tests.AntonioTest.Repo
                 Comment = "Excellent!"
             };
 
-            // Capture the output for logging
+       
             using (var sw = new StringWriter())
             {
                 Console.SetOut(sw);
@@ -61,7 +61,7 @@ namespace Tests.AntonioTest.Repo
 
             _innerRepositoryMock.Setup(repo => repo.GetReviews()).Returns(reviews);
 
-            // Capture the output for logging
+
             using (var sw = new StringWriter())
             {
                 Console.SetOut(sw);

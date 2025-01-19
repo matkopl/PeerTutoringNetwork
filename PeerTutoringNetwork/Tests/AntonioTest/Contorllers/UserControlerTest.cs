@@ -29,7 +29,7 @@ namespace Tests.AntonioTest.Contorllers
             var b64salt = PasswordHashProvider.GetSalt();
             var b64hash = PasswordHashProvider.GetHash("testpassword", b64salt);
 
-            // Setup the mock context for Users DbSet
+         
             var users = new List<User>
             {
                 new User

@@ -19,13 +19,13 @@ namespace Tests.AntonioTest.Contorllers
 
         public AdminControllerTests()
         {
-            // Mock the PeerTutoringNetworkContext
+           
             _contextMock = new Mock<PeerTutoringNetworkContext>();
 
-            // Create the controller instance
+           
             _adminController = new AdminController(null, _contextMock.Object);
 
-            // Setup DbSet mock for Users and Subjects
+         
             var users = new List<User>
             {
                 new User { UserId = 1, Username = "testUser1", RoleId = 3, Email = "test1@example.com" },
