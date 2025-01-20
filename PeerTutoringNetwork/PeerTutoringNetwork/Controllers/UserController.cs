@@ -172,29 +172,6 @@ namespace PeerTutoringNetwork.Controllers
             }
         }
 
-        [HttpDelete("[action]")]
-        public ActionResult ClearOptionalData(int userId)
-        {
-            try
-            {
-                var user = _context.Users.FirstOrDefault(u => u.UserId == userId);
-
-                if (user == null)
-                    return NotFound("User not found");
-
-                // Brisanje neobaveznih podataka
-                user.Phone = null;
-                user.Email = null;
-
-                _context.SaveChanges();
-
-                return Ok("Optional data cleared successfully");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
 
         [HttpGet("GetAllUsers")]
         public IActionResult GetAllUsers()

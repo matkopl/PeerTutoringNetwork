@@ -58,6 +58,7 @@ namespace Tests.AntonioTest.Contorllers
             _userController = new UserController(_configurationMock.Object, _contextMock.Object);
         }
 
+      
 
         [Fact]
         public void UpdateProfile_ShouldReturnOk_WhenUserProfileIsUpdated()
