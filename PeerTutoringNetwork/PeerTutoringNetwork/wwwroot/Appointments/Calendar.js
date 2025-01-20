@@ -1,7 +1,14 @@
 import { CalendarBase } from './CalendarBase.js';
-// TODO  Liskov Substitution Principle
 export class Calendar extends CalendarBase {
-    // TODO ocp
+    // TODO singleton Calendar
+    static instance;
+    constructor(selector, events) {
+        if (Calendar.instance) {
+            return Calendar.instance;
+        }
+        super(selector, events);
+        Calendar.instance = this;
+    }
     openDay(el) {
         let details, arrow;
         const dayNumber = +el.querySelectorAll('.day-number')[0].innerText || +el.querySelectorAll('.day-number')[0].textContent;

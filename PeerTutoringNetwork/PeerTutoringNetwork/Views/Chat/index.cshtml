@@ -1,0 +1,72 @@
+@using PeerTutoringNetwork.Viewmodels
+@model IEnumerable<PeerTutoringNetwork.Viewmodels.UserVM>
+
+<link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+@{
+    ViewData["Title"] = "Chat";
+    Layout = "_Layout";
+}
+
+<body>
+<div class="container">
+    <h2>Chat</h2>
+    <div id="userList" class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Username</th>
+                <th>Role</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody id="usersTableBody">
+            <!-- Users will be populated here by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+       $(document).ready(function() {
+           fetchUsers();
+       
+           function fetchUsers() {
+               $.ajax({
+                   url: '@Url.ActionLink("FetchAllUsersForChat", "Chat")',
+                   method: 'GET',
+                   success: function(data) {
+                       var usersTableBody = $('#usersTableBody');
+                       usersTableBody.empty();
+                       data.forEach(function(user) {
+                           usersTableBody.append(
+                               '<tr>' +
+                                   '<td>' + user.userName + '</td>' +
+                                   '<td id="role-' + user.userId + '">Loading...</td>' +
+                                   '<td>' +
+'<a href="@Url.Action("Chat", "Chat")/' + user.userId + '" class="btn btn-primary">Message</a>' +                                   '</td>' +
+                               '</tr>'
+                           );
+       
+                           $.ajax({
+                               url: '/api/Chat/GetRoleById/' + user.role,
+                               method: 'GET',
+                               success: function(roleData) {
+                                   $('#role-' + user.userId).text(roleData.roleName);
+                               },
+                               error: function(error) {
+                                   console.error('Error fetching role:', error);
+                                   $('#role-' + user.userId).text('Error');
+                               }
+                           });
+                       });
+                   },
+                   error: function(error) {
+                       console.error('Error fetching users:', error);
+                   }
+               });
+           }
+       });
+    </script>
+</body>

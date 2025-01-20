@@ -32,8 +32,7 @@
                 console.log(roleId);
             }
             else if (roleId == 1) {
-                window.location.href = "StudentDashboard/Index"; // Stavi StudentDashboard/Index MATKOOOOOO
-                console.log(roleId);
+                window.location.href = `/StudentDashboard/Index?jwtToken=${encodeURIComponent(token)}`; 
             }
             else {
                 alert("Unknown role ID: " + roleId);

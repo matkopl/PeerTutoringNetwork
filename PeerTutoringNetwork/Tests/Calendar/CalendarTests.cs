@@ -78,7 +78,7 @@ namespace Tests
             SeedDatabase();
         }
 
-        private void SeedDatabase()
+        private void  SeedDatabase()
         {
             var roles = new List<Role>
             {

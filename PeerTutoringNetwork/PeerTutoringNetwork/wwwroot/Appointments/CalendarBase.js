@@ -1,5 +1,11 @@
 export class CalendarBase {
+    // TODO singleton CalendarBase
+    static instance;
+
     constructor(selector, events) {
+        if (CalendarBase.instance) {
+            return CalendarBase.instance;
+        }
         this.el = document.querySelector(selector);
         this.events = events;
         this.current = moment().date(1);
@@ -10,6 +16,7 @@ export class CalendarBase {
                 this.openDay(current);
             }, 500);
         }
+        CalendarBase.instance = this;
     }
 
     draw() {
