@@ -8,9 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using BL.Models;
 using PeerTutoringNetwork.DTOs;
 using PeerTutoringNetwork.Security;
+using BL.Factories;
+using BL.Class;
 
 namespace PeerTutoringNetwork.Controllers
-{
+{ // 2. Factory pattern -- ovo je Factory pattern jer se koristi za instanciranje objekata u metodi AddUser
     public class UsersController : Controller
     {
         private readonly IConfiguration _configuration;
@@ -21,7 +23,57 @@ namespace PeerTutoringNetwork.Controllers
             _configuration = configuration;
             _context = context;
         }
+        [HttpPost("AddUser")]
+        public IActionResult AddUser([FromBody] UserRegisterDto userDto)
+        {
+            try
+            {
+                // Koristi Factory Method za stvaranje korisnika
+                var user = UserFactory.CreateUser(userDto.RoleId);
 
+                user.UserId = userDto.Id;
+                user.Username = userDto.Username;
+                user.Email = userDto.Email;
+
+               
+                _context.Users.Add(new User
+                {
+                    UserId = user.UserId,
+                    Username = user.Username,
+                    Email = user.Email,
+                    RoleId = userDto.RoleId switch
+                    {
+                        3 => 3, // Admin
+                        2 => 2, // Teacher
+                        1 => 1 ,// Student
+                        _ => 0
+                    }
+                });
+
+                _context.SaveChanges();
+
+                return Ok("User added successfully");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet("[action]")]
+        public IActionResult ExecuteUserAction(int userId, int roleId)
+        {
+            try
+            {
+                var demo = new StrategyPatternRoles(_context);
+                demo.Run(userId, roleId);
+                return Ok("Action executed successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
         // GET: Users
         public async Task<IActionResult> Index()
         {

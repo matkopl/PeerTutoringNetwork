@@ -234,6 +234,87 @@ function showEditUserForm(user) {
     // Prikaži formu za uređivanje
     document.getElementById('edit-user-form').classList.remove('hidden');
 }
+// Dohvati sve subjekte
+function fetchSubjects() {
+    fetch('/api/Subject/GetAllSubjects', {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('jwtToken')}` }
+    })
+        .then(response => response.json())
+        .then(subjects => {
+            const subjectTableBody = document.getElementById('subject-table').querySelector('tbody');
+            subjectTableBody.innerHTML = '';
+            subjects.forEach(subject => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${subject.subjectId}</td>
+                    <td>${subject.subjectName}</td>
+                    <td>${subject.description}</td>
+                    <td>
+                        <button class="edit-button" onclick="editSubject(${subject.subjectId})">Edit</button>
+                        <button class="delete-button" onclick="deleteSubject(${subject.subjectId})">Delete</button>
+                    </td>
+                `;
+                subjectTableBody.appendChild(row);
+            });
+        })
+        .catch(error => console.error('Error fetching subjects:', error));
+}
+
+// Dodaj novi subject
+function addSubject(event) {
+    event.preventDefault();
+    const subject = {
+        subjectName: document.getElementById('subject-name').value,
+        description: document.getElementById('subject-description').value
+    };
+
+    fetch('/api/Subject/AddSubject', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
+        },
+        body: JSON.stringify(subject)
+    })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to add subject');
+            alert('Subject added successfully');
+            hideSubjectForm();
+            fetchSubjects();
+        })
+        .catch(error => console.error('Error adding subject:', error));
+}
+
+// Obriši subject
+function deleteSubject(subjectId) {
+    if (!confirm('Are you sure you want to delete this subject?')) return;
+
+    fetch(`/api/Subject/DeleteSubject/${subjectId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('jwtToken')}` }
+    })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to delete subject');
+            alert('Subject deleted successfully');
+            fetchSubjects();
+        })
+        .catch(error => console.error('Error deleting subject:', error));
+}
+
+// Prikaži formu za dodavanje subjekata
+function showAddSubjectForm() {
+    document.getElementById('subject-name').value = '';
+    document.getElementById('subject-description').value = '';
+    document.getElementById('add-subject-form').classList.remove('hidden');
+}
+
+// Sakrij formu za dodavanje subjekata
+function hideSubjectForm() {
+    document.getElementById('add-subject-form').classList.add('hidden');
+}
+
+// Inicijalizacija
+fetchSubjects();
 
 
 function hideEditUserForm() {

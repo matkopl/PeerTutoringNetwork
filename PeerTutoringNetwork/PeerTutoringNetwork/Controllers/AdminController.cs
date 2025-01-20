@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using PeerTutoringNetwork.DTO;
 using PeerTutoringNetwork.DTOs;
 using PeerTutoringNetwork.Security;
+using PeerTutoringNetwork.Viewmodels;
 
 namespace PeerTutoringNetwork.Controllers
 {
@@ -79,21 +80,58 @@ namespace PeerTutoringNetwork.Controllers
             }
         }
 
-        [HttpGet("GetUserStatistics")]
+        /*  [HttpGet("GetUserStatistics")]
 
+          public IActionResult GetUserStatistics()
+          {
+              try
+              {
+                  var totalUsers = _context.Users.Count();
+                  return Ok(new { totalUsers });
+              }
+              catch (Exception ex)
+              {
+                  return StatusCode(500, $"Internal server error: {ex.Message}");
+              }
+
+          }*/
+
+        [HttpGet("GetUserStatistics")]
         public IActionResult GetUserStatistics()
         {
-            try
-            {
-                var totalUsers = _context.Users.Count();
-                return Ok(new { totalUsers });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            var userCount = _context.Users.Count();
+            var adminCount = _context.Users.Count(u => u.RoleId == 3); // Admin RoleId = 3
+            var teacherCount = _context.Users.Count(u => u.RoleId == 2); // Teacher RoleId = 2
+            var studentCount = _context.Users.Count(u => u.RoleId == 1); // Student RoleId = 1
 
+            return Ok(new
+            {
+                userCount,
+                adminCount,
+                teacherCount,
+                studentCount
+            });
         }
+
+        [HttpGet("GetSubjectAverageRatings")]
+        public IActionResult GetSubjectAverageRatings()
+        {
+            // Dohvaćanje svih subjekata, uključujući one koji nemaju recenzije
+            var subjectsWithRatings = _context.Subjects
+                .Select(subject => new
+                {
+                    // Ako predmet ima ocjene, dohvati prosječnu ocjenu, inače prikaži poruku
+                    SubjectName = subject.SubjectName,
+                    AverageRating = _context.Reviews
+                        .Where(r => r.SubjectId == subject.SubjectId)
+                        .Average(r => (double?)r.Rating ?? 0)
+                })
+            .ToList();
+
+
+            return Ok(subjectsWithRatings);
+        }
+
         [HttpPost("[action]")]
         public ActionResult AddUser(UserRegisterDto userDto)
         {
@@ -120,8 +158,22 @@ namespace PeerTutoringNetwork.Controllers
                 _context.Users.Add(user);
                 _context.SaveChanges();
 
-                // Vraćamo JSON s porukom i korisnikom
-                return Ok(new { message = "User added successfully", user });
+                var response = new
+                {
+                    message = "User added successfully",
+                    user = new
+                    {
+                        user.UserId,
+                        user.Username,
+                        user.Email,
+                        user.FirstName,
+                        user.LastName,
+                        user.Phone,
+                        user.RoleId
+                    }
+                };
+
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -187,5 +239,56 @@ namespace PeerTutoringNetwork.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
+        [HttpGet("GetAllSubjects")]
+        public ActionResult<IEnumerable<object>> GetAllSubjects()
+        {
+            var subjects = _context.Subjects
+                .Select(s => new
+                {
+                    SubjectId = s.SubjectId,
+                    Name = s.SubjectName, // Provjerite da li postoji ovo polje u bazi
+                    Description = s.Description
+                })
+                .ToList();
+
+            return Ok(subjects);
+        }
+
+        [HttpPost("AddSubject")]
+        public IActionResult AddSubject([FromBody] SubjectDto subjectDto)
+        {
+            if (subjectDto == null || string.IsNullOrEmpty(subjectDto.Name))
+            {
+                return BadRequest("Invalid subject data.");
+            }
+
+            // Stvori novi Subject koristeći podatke iz DTO-a
+            var subject = new Subject
+            {
+                SubjectName = subjectDto.Name,
+                Description = subjectDto.Description,
+                CreatedByUserId = subjectDto.UserId // Postavljamo UserId iz DTO-a
+            };
+
+            _context.Subjects.Add(subject);
+            _context.SaveChanges();
+
+            return Ok(new { message = "Subject added successfully" });
+        }
+
+
+        [HttpDelete("DeleteSubject/{subjectId}")]
+        public ActionResult DeleteSubject(int subjectId)
+        {
+            var subject = _context.Subjects.FirstOrDefault(s => s.SubjectId == subjectId);
+            if (subject == null)
+                return NotFound("Subject not found.");
+
+            _context.Subjects.Remove(subject);
+            _context.SaveChanges();
+            return Ok(new { message = "Subject deleted successfully." });
+        }
+
     }
 }

@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Statistics</title>
+    <link rel="stylesheet" href="Admin.css">
+</head>
+<body>
+    <!-- Navigacijska traka -->
+    <nav class="navbar">
+        <div class="navbar-logo">Admin Dashboard</div>
+        <ul class="nav-left">
+            <li><a href="Admin.html">UserManager</a></li>
+            <li><a href="AdminSubjects.html">SubjectManager</a></li>
+            <li><a href="AdminStatistics.html">Statistika</a></li>
+            <li><a href="Profile.html">Profile Page</a></li>
+        </ul>
+        <ul class="nav-right">
+            <li><a href="/Login.html" onclick="logout()">Logout</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <!-- Statistika korisnika -->
+        <div id="statistics" class="statistics">
+            <div class="stat-item">
+                <p id="user-count">User Count: 0</p>
+            </div>
+            <div class="stat-item">
+                <p id="admin-count">Admin Count: 0</p>
+            </div>
+            <div class="stat-item">
+                <p id="teacher-count">Teacher Count: 0</p>
+            </div>
+            <div class="stat-item">
+                <p id="student-count">Student Count: 0</p>
+            </div>
+        </div>
+
+        <!-- Prosječne ocjene predmeta -->
+        <table id="subject-table" class="user-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Average Rating</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dinamički popunjavanje subjekata -->
+            </tbody>
+        </table>
+    </main>
+
+    <script src="AdminStatistics.js"></script>
+</body>
+</html>

@@ -6,6 +6,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using BL.Models;
+using BL.Repositories;
+using BL.lnterfaces;
 using BL.Services;
 using BL.Hubs;
 
@@ -59,6 +61,9 @@ builder.Services.AddDbContext<PeerTutoringNetworkContext>(options => {
 });
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 builder.Services.AddHttpClient();
+
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();// Add the repository to the services
+builder.Services.AddScoped<ReviewService>();
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
