@@ -1,33 +1,24 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PeerTutoringNetwork.Viewmodels;
 using BL.Models;
+using PeerTutoringNetwork.DesignPatterns;
 
 namespace PeerTutoringNetwork.Controllers
 {
     public class MentorDashboardController : Controller
     {
         private readonly PeerTutoringNetworkContext _context;
+        private readonly DashboardFacade _dashboardFacade;
 
-        public MentorDashboardController(PeerTutoringNetworkContext context)
+        public MentorDashboardController(PeerTutoringNetworkContext context, DashboardFacade dashboardFacade)
         {
             _context = context;
+            _dashboardFacade = dashboardFacade;
         }
 
         public IActionResult Index()
         {
-            var dashboardData = new MentorDashboardVM
-            {
-                TotalAppointments = _context.Appointments.Count(),
-                TotalSubjects = _context.Subjects.Count(),
-                RecentAppointments = _context.Appointments
-                    .OrderByDescending(a => a.AppointmentDate)
-                    .Take(5)
-                    .ToList(),
-                RecentSubjects = _context.Subjects
-                    .OrderByDescending(s => s.SubjectId)
-                    .Take(5)
-                    .ToList()
-            };
+            var dashboardData = _dashboardFacade.GetMentorDashboardData();
 
             return View(dashboardData);
         }

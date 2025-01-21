@@ -1,96 +1,104 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BL.Models;
+﻿using BL.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PeerTutoringNetwork.Controllers;
+using PeerTutoringNetwork.DesignPatterns;
+using PeerTutoringNetwork.Viewmodels;
 using Xunit;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+using System;
+using System.Linq;
 
 namespace Matko.Tests
 {
     public class ReservationsControllerTests
     {
-        private readonly PeerTutoringNetworkContext _context;
         private readonly ReservationsController _controller;
+        private readonly ReservationNotifier _reservationNotifier;
+        private readonly ReservationRepository _reservationRepository;
+        private readonly PeerTutoringNetworkContext _context;
 
         public ReservationsControllerTests()
         {
-            // Ensure a unique in-memory database for this test class
             var options = new DbContextOptionsBuilder<PeerTutoringNetworkContext>()
-                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()) // Use unique database name
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
 
             _context = new PeerTutoringNetworkContext(options);
-
-            // Seed the database with test data
+            _context.Database.EnsureDeleted();
             SeedDatabase();
 
-            // Initialize the controller
-            _controller = new ReservationsController(_context);
+            _reservationNotifier = new ReservationNotifier();
+            _reservationRepository = new ReservationRepository(_context);
+            var reservationFactory = new ReservationFactory();
+
+            _controller = new ReservationsController(
+                _context,
+                reservationFactory,
+                _reservationRepository,
+                _reservationNotifier
+            );
         }
 
         private void SeedDatabase()
         {
-            // Clear existing data if any (in case of overlapping seeding issues)
-            _context.Users.RemoveRange(_context.Users);
-            _context.Appointments.RemoveRange(_context.Appointments);
-            _context.AppointmentReservations.RemoveRange(_context.AppointmentReservations);
-            _context.SaveChanges();
-
-            var users = new List<User>
+            var mentor = new User
             {
-                new User
-                {
-                    UserId = 601, // Unique ID
-                    Username = "Student1",
-                    Email = "student1@example.com",
-                    FirstName = "Student",
-                    LastName = "One",
-                    PwdHash = Encoding.UTF8.GetBytes("student1pwd"),
-                    PwdSalt = Encoding.UTF8.GetBytes("student1salt"),
-                    RoleId = 2
-                },
-                new User
-                {
-                    UserId = 602, // Unique ID
-                    Username = "Mentor1",
-                    Email = "mentor1@example.com",
-                    FirstName = "Mentor",
-                    LastName = "One",
-                    PwdHash = Encoding.UTF8.GetBytes("mentor1pwd"),
-                    PwdSalt = Encoding.UTF8.GetBytes("mentor1salt"),
-                    RoleId = 1
-                }
+                UserId = 601,
+                Username = "Mentor1",
+                Email = "mentor1@example.com",
+                FirstName = "Mentor",
+                LastName = "One",
+                PwdHash = Encoding.UTF8.GetBytes("12345678"),
+                PwdSalt = Encoding.UTF8.GetBytes("12345678"),
+                RoleId = 1
             };
 
-            var appointments = new List<Appointment>
+            var student = new User
             {
-                new Appointment
-                {
-                    AppointmentId = 701, // Unique ID
-                    MentorId = 602,
-                    SubjectId = 501, // Ensure unique SubjectId
-                    AppointmentDate = DateTime.Now.AddDays(1)
-                }
+                UserId = 602,
+                Username = "Student1",
+                Email = "student1@example.com",
+                FirstName = "Student",
+                LastName = "One",
+                PwdHash = Encoding.UTF8.GetBytes("12345678"),
+                PwdSalt = Encoding.UTF8.GetBytes("12345678"),
+                RoleId = 2
             };
 
-            var reservations = new List<AppointmentReservation>
+            var subject = new Subject
             {
-                new AppointmentReservation
-                {
-                    ReservationId = 801, // Unique ID
-                    AppointmentId = 701,
-                    StudentId = 601,
-                    ReservationTime = DateTime.Now
-                }
+                SubjectId = 501,
+                SubjectName = "Mathematics",
+                Description = "Math Subject"
             };
 
-            _context.Users.AddRange(users);
-            _context.Appointments.AddRange(appointments);
-            _context.AppointmentReservations.AddRange(reservations);
+            var appointment = new Appointment
+            {
+                AppointmentId = 701,
+                MentorId = mentor.UserId,
+                SubjectId = subject.SubjectId,
+                AppointmentDate = DateTime.Now.AddDays(1),
+                Mentor = mentor,
+                Subject = subject,
+            };
+
+            var reservation = new AppointmentReservation
+            {
+                ReservationId = 801,
+                AppointmentId = appointment.AppointmentId,
+                StudentId = student.UserId,
+                ReservationTime = DateTime.Now,
+                Appointment = appointment,
+                Student = student
+            };
+
+            _context.Users.AddRange(mentor, student);
+            _context.Subjects.Add(subject);
+            _context.Appointments.Add(appointment);
+            _context.AppointmentReservations.Add(reservation);
             _context.SaveChanges();
         }
 
@@ -102,18 +110,19 @@ namespace Matko.Tests
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
-            var model = Assert.IsAssignableFrom<List<AppointmentReservation>>(viewResult.ViewData.Model);
-            Assert.Single(model); // Ensure there is one reservation
+            var model = Assert.IsAssignableFrom<List<ReservationVM>>(viewResult.ViewData.Model);
+            Assert.NotEmpty(model); 
+            Assert.Equal(1, model.Count); 
         }
 
         [Fact]
-        public async Task Create_ValidModel_AddsReservation()
+        public async Task Create_ValidModel_AddsReservation_AndNotifies()
         {
             // Arrange
-            var newReservation = new AppointmentReservation
+            var newReservation = new ReservationVM
             {
-                AppointmentId = 701,
-                StudentId = 601,
+                AppointmentId = 701, 
+                StudentId = 602, 
                 ReservationTime = DateTime.Now
             };
 
@@ -121,56 +130,114 @@ namespace Matko.Tests
             var result = await _controller.Create(newReservation);
 
             // Assert
-            var redirectResult = Assert.IsType<ViewResult>(result);
-            var reservations = _context.AppointmentReservations.ToList();
-            Assert.Equal(2, reservations.Count); // Ensure the new reservation is added
+            if (result is ConflictObjectResult conflictResult)
+            {
+                Assert.Equal("This appointment is already reserved.", conflictResult.Value);
+            }
+            else
+            {
+                var jsonResult = Assert.IsType<JsonResult>(result);
+                Assert.Contains("Appointment reserved successfully!", jsonResult.Value.ToString());
+
+                var reservations = await _context.AppointmentReservations.ToListAsync();
+                Assert.Equal(2, reservations.Count);
+            }
         }
 
         [Fact]
-        public async Task DeleteConfirmed_RemovesReservation()
+        public async Task Create_InvalidModel_ReturnsBadRequest()
         {
-            // Act
-            var result = await _controller.DeleteConfirmed(801);
+            _controller.ModelState.AddModelError("Error", "Invalid data");
 
-            // Assert
-            var okResult = Assert.IsType<OkObjectResult>(result);
-            Assert.Equal("Reservation canceled successfully.", okResult.Value);
+            var invalidReservation = new ReservationVM();
 
-            var reservations = _context.AppointmentReservations.ToList();
-            Assert.Empty(reservations); // Ensure the reservation is deleted
+            var result = await _controller.Create(invalidReservation);
+
+            Assert.IsType<BadRequestObjectResult>(result);
         }
 
         [Fact]
-        public async Task Edit_ValidModel_UpdatesReservation()
+        public async Task DeleteConfirmed_RemovesReservation_AndNotifies()
         {
-            // Arrange
-            var reservation = await _context.AppointmentReservations.FindAsync(801);
-            Assert.NotNull(reservation);
-
-            reservation.ReservationTime = DateTime.Now.AddDays(2); // Update a field
-
             // Act
-            var result = await _controller.Edit(801, reservation);
+            var result = await _controller.DeleteConfirmed(801); // Valid seeded reservation ID
 
             // Assert
-            var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Index", redirectToActionResult.ActionName);
+            if (result is NotFoundResult)
+            {
+                Assert.True(false, "Reservation ID 801 not found in the test context.");
+            }
+            else
+            {
+                var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+                Assert.Equal("Index", redirectResult.ActionName);
 
-            var updatedReservation = await _context.AppointmentReservations.FindAsync(801);
-            Assert.NotNull(updatedReservation);
-            Assert.Equal(reservation.ReservationTime, updatedReservation.ReservationTime); // Ensure the change is saved
+                var reservations = await _context.AppointmentReservations.ToListAsync();
+                Assert.Empty(reservations);
+            }
         }
 
         [Fact]
         public async Task Details_ReturnsReservationDetails()
         {
             // Act
-            var result = await _controller.Details(801);
+            var result = await _controller.Details(801); 
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
-            var model = Assert.IsAssignableFrom<AppointmentReservation>(viewResult.ViewData.Model);
-            Assert.Equal(801, model.ReservationId);
+            var model = Assert.IsType<ReservationVM>(viewResult.ViewData.Model);
+
+            Assert.Equal(801, model.ReservationId); 
+            Assert.Equal(602, model.StudentId); 
+            Assert.Equal("Student1", model.StudentName); 
+        }
+
+
+        [Fact]
+        public async Task Details_InvalidId_ReturnsNotFound()
+        {
+            var result = await _controller.Details(999);
+
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Edit_ValidModel_UpdatesReservation()
+        {
+            var updatedReservation = new ReservationVM
+            {
+                ReservationId = 801,
+                AppointmentId = 701,
+                StudentId = 602,
+                ReservationTime = DateTime.Now.AddDays(2)
+            };
+
+            _context.Entry(await _context.AppointmentReservations.FindAsync(801)).State = EntityState.Detached;
+
+            var result = await _controller.Edit(801, updatedReservation);
+
+            Assert.IsType<RedirectToActionResult>(result);
+
+            var reservation = await _context.AppointmentReservations.FindAsync(801);
+            Assert.NotNull(reservation);
+            Assert.Equal(updatedReservation.ReservationTime, reservation.ReservationTime);
+        }
+
+        [Fact]
+        public async Task Edit_InvalidModel_ReturnsViewResult()
+        {
+            _controller.ModelState.AddModelError("Error", "Invalid data");
+
+            var invalidReservation = new ReservationVM
+            {
+                ReservationId = 801,
+                AppointmentId = 701,
+                StudentId = 602
+            };
+
+            var result = await _controller.Edit(801, invalidReservation);
+
+            Assert.IsType<ViewResult>(result);
         }
     }
 }

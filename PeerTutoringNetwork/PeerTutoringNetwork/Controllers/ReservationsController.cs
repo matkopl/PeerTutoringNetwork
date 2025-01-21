@@ -1,48 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PeerTutoringNetwork.Viewmodels;
 using BL.Models;
+using PeerTutoringNetwork.DesignPatterns;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace PeerTutoringNetwork.Controllers
 {
     public class ReservationsController : Controller
     {
         private readonly PeerTutoringNetworkContext _context;
+        private readonly IFactory<AppointmentReservation, ReservationVM> _reservationFactory;
+        private readonly IRepository<AppointmentReservation> _reservationRepository;
+        private readonly ISubject _reservationNotifier;
 
-        public ReservationsController(PeerTutoringNetworkContext context)
+        public ReservationsController(
+            PeerTutoringNetworkContext context,
+            IFactory<AppointmentReservation, ReservationVM> reservationFactory,
+            IRepository<AppointmentReservation> reservationRepository,
+            ISubject reservationNotifier)
         {
             _context = context;
+            _reservationFactory = reservationFactory;
+            _reservationRepository = reservationRepository;
+            _reservationNotifier = reservationNotifier;
         }
 
         // GET: Reservations
         public async Task<IActionResult> Index()
         {
-            var peerTutoringNetworkContext = _context.AppointmentReservations.Include(a => a.Appointment).Include(a => a.Student);
-            return View(await peerTutoringNetworkContext.ToListAsync());
+            var reservations = await _reservationRepository.GetAllAsync();
+            var reservationsVM = reservations.Select(r => _reservationFactory.CreateVM(r)).ToList();
+            return View(reservationsVM);
         }
 
         // GET: Reservations/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            var reservation = await _reservationRepository.GetByIdAsync(id);
+            if (reservation == null) return NotFound();
 
-            var appointmentReservation = await _context.AppointmentReservations
-                .Include(a => a.Appointment)
-                .Include(a => a.Student)
-                .FirstOrDefaultAsync(m => m.ReservationId == id);
-            if (appointmentReservation == null)
-            {
-                return NotFound();
-            }
-
-            return View(appointmentReservation);
+            var reservationVM = _reservationFactory.CreateVM(reservation);
+            return View(reservationVM);
         }
 
         // GET: Reservations/Create
@@ -54,107 +53,74 @@ namespace PeerTutoringNetwork.Controllers
         }
 
         // POST: Reservations/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ReservationId,AppointmentId,StudentId,ReservationTime")] AppointmentReservation appointmentReservation)
+        public async Task<IActionResult> Create([Bind("AppointmentId,StudentId,ReservationTime")] ReservationVM reservationVM)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid reservation data.");
+            }
 
+            var reservation = _reservationFactory.CreateModel(reservationVM);
 
-            _context.Add(appointmentReservation);
-            await _context.SaveChangesAsync();
+            // Check if the appointment already has a reservation
+            var isReserved = await _context.AppointmentReservations.AnyAsync(r => r.AppointmentId == reservationVM.AppointmentId);
+            if (isReserved)
+            {
+                return Conflict("This appointment is already reserved.");
+            }
 
-            ViewData["AppointmentId"] = new SelectList(_context.Appointments, "AppointmentId", "AppointmentId", appointmentReservation.AppointmentId);
-            ViewData["StudentId"] = new SelectList(_context.Users, "UserId", "Username", appointmentReservation.StudentId);
-            return View(appointmentReservation);
+            await _reservationRepository.AddAsync(reservation);
+
+            // Notify observers
+            _reservationNotifier.NotifyObservers($"Reservation created for Appointment ID: {reservation.AppointmentId}, Student ID: {reservation.StudentId}");
+
+            return Json(new { success = true, message = "Appointment reserved successfully!" });
         }
 
         // GET: Reservations/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var appointmentReservation = await _context.AppointmentReservations.FindAsync(id);
-            if (appointmentReservation == null)
-            {
-                return NotFound();
-            }
-            ViewData["AppointmentId"] = new SelectList(_context.Appointments, "AppointmentId", "AppointmentId", appointmentReservation.AppointmentId);
-            ViewData["StudentId"] = new SelectList(_context.Users, "UserId", "Username", appointmentReservation.StudentId);
-            return View(appointmentReservation);
+            var reservation = await _reservationRepository.GetByIdAsync(id.Value);
+            if (reservation == null) return NotFound();
+
+            var reservationVM = _reservationFactory.CreateVM(reservation);
+            ViewData["AppointmentId"] = new SelectList(_context.Appointments, "AppointmentId", "AppointmentId", reservationVM.AppointmentId);
+            ViewData["StudentId"] = new SelectList(_context.Users, "UserId", "Username", reservationVM.StudentId);
+            return View(reservationVM);
         }
 
         // POST: Reservations/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ReservationId,AppointmentId,StudentId,ReservationTime")] AppointmentReservation appointmentReservation)
+        public async Task<IActionResult> Edit(int id, [Bind("ReservationId,AppointmentId,StudentId,ReservationTime")] ReservationVM reservationVM)
         {
-            if (id != appointmentReservation.ReservationId)
+            if (id != reservationVM.ReservationId) return NotFound();
+
+            if (!ModelState.IsValid)
             {
-                return NotFound();
+                ViewData["AppointmentId"] = new SelectList(_context.Appointments, "AppointmentId", "AppointmentId", reservationVM.AppointmentId);
+                ViewData["StudentId"] = new SelectList(_context.Users, "UserId", "Username", reservationVM.StudentId);
+                return View(reservationVM);
             }
 
-            ModelState.Remove("Student");
-            ModelState.Remove("Appointment");
+            var reservation = _reservationFactory.CreateModel(reservationVM);
+            await _reservationRepository.UpdateAsync(reservation);
 
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(appointmentReservation);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!AppointmentReservationExists(appointmentReservation.ReservationId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            foreach (var entry in ModelState)
-            {
-                Console.WriteLine($"Key: {entry.Key}, AttemptedValue: {entry.Value.AttemptedValue}");
-                foreach (var error in entry.Value.Errors)
-                {
-                    Console.WriteLine($"Error: {error.ErrorMessage}");
-                }
-            }
-            ViewData["AppointmentId"] = new SelectList(_context.Appointments, "AppointmentId", "AppointmentId", appointmentReservation.AppointmentId);
-            ViewData["StudentId"] = new SelectList(_context.Users, "UserId", "Username", appointmentReservation.StudentId);
-            return View(appointmentReservation);
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Reservations/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            var reservation = await _reservationRepository.GetByIdAsync(id);
+            if (reservation == null) return NotFound();
 
-            var appointmentReservation = await _context.AppointmentReservations
-                .Include(a => a.Appointment)
-                .Include(a => a.Student)
-                .FirstOrDefaultAsync(m => m.ReservationId == id);
-            if (appointmentReservation == null)
-            {
-                return NotFound();
-            }
-
-            return View(appointmentReservation);
+            var reservationVM = _reservationFactory.CreateVM(reservation);
+            return View(reservationVM);
         }
 
         // POST: Reservations/Delete/5
@@ -162,31 +128,15 @@ namespace PeerTutoringNetwork.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var reservation = await _context.AppointmentReservations
-                .Include(r => r.Appointment) // Include related appointment
-                .FirstOrDefaultAsync(r => r.ReservationId == id);
+            var reservation = await _reservationRepository.GetByIdAsync(id);
+            if (reservation == null) return NotFound();
 
-            if (reservation == null)
-            {
-                return NotFound("Reservation not found.");
-            }
+            await _reservationRepository.DeleteAsync(id);
 
-            try
-            {
-                _context.AppointmentReservations.Remove(reservation);
-                await _context.SaveChangesAsync();
+            // Notify observers
+            _reservationNotifier.NotifyObservers($"Reservation deleted for Appointment ID: {reservation.AppointmentId}, Student ID: {reservation.StudentId}");
 
-                return Ok("Reservation canceled successfully.");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
-
-        private bool AppointmentReservationExists(int id)
-        {
-            return _context.AppointmentReservations.Any(e => e.ReservationId == id);
+            return RedirectToAction(nameof(Index));
         }
     }
 }

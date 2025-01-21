@@ -4,6 +4,7 @@
     {
         public int ReservationId { get; set; } 
         public string StudentName { get; set; } = string.Empty; 
+        public int StudentId { get; set; }
         public DateTime ReservationTime { get; set; } 
         public int AppointmentId { get; set; }
         public string MentorUsername { get; set; } = string.Empty;

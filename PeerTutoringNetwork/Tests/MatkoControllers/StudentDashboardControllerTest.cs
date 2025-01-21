@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using BL.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Moq;
 using PeerTutoringNetwork.Controllers;
+using PeerTutoringNetwork.DesignPatterns;
 using PeerTutoringNetwork.Viewmodels;
 using Xunit;
 
@@ -20,7 +17,6 @@ namespace Matko.Tests
     {
         private readonly PeerTutoringNetworkContext _context;
         private readonly StudentDashboardController _controller;
-        private readonly Mock<ILogger<StudentDashboardController>> _mockLogger;
 
         public StudentDashboardControllerTests()
         {
@@ -30,13 +26,16 @@ namespace Matko.Tests
                 .Options;
 
             _context = new PeerTutoringNetworkContext(options);
-            _mockLogger = new Mock<ILogger<StudentDashboardController>>();
+            _context.Database.EnsureDeleted();
 
             // Seed the database with initial data
             SeedDatabase();
 
-            // Initialize the controller
-            _controller = new StudentDashboardController(_context, _mockLogger.Object);
+            // Initialize the DashboardFacade
+            var dashboardFacade = new DashboardFacade(_context);
+
+            // Initialize the controller with the DashboardFacade
+            _controller = new StudentDashboardController(dashboardFacade);
         }
 
         private void SeedDatabase()
@@ -52,9 +51,8 @@ namespace Matko.Tests
                     LastName = "One",
                     PwdHash = Encoding.UTF8.GetBytes("12345678"),
                     PwdSalt = Encoding.UTF8.GetBytes("12345678"),
-                    RoleId = 1 
+                    RoleId = 1
                 },
-
                 new User
                 {
                     UserId = 702,
@@ -64,10 +62,9 @@ namespace Matko.Tests
                     LastName = "One",
                     PwdHash = Encoding.UTF8.GetBytes("12345678"),
                     PwdSalt = Encoding.UTF8.GetBytes("12345678"),
-                    RoleId = 2 
+                    RoleId = 2
                 }
             };
-
 
             var subjects = new List<Subject>
             {
@@ -77,13 +74,13 @@ namespace Matko.Tests
 
             var appointments = new List<Appointment>
             {
-                new Appointment { AppointmentId = 901, MentorId = 702, SubjectId = 801, AppointmentDate = DateTime.Now.AddDays(1) },
-                new Appointment { AppointmentId = 902, MentorId = 702, SubjectId = 802, AppointmentDate = DateTime.Now.AddDays(2) }
+                new Appointment { AppointmentId = 901, MentorId = 701, SubjectId = 801, AppointmentDate = DateTime.Now.AddDays(1) },
+                new Appointment { AppointmentId = 902, MentorId = 701, SubjectId = 802, AppointmentDate = DateTime.Now.AddDays(2) }
             };
 
             var reservations = new List<AppointmentReservation>
             {
-                new AppointmentReservation { ReservationId = 1001, AppointmentId = 901, StudentId = 701, ReservationTime = DateTime.Now }
+                new AppointmentReservation { ReservationId = 1001, AppointmentId = 901, StudentId = 702, ReservationTime = DateTime.Now }
             };
 
             _context.Users.AddRange(users);
@@ -97,7 +94,7 @@ namespace Matko.Tests
         public async Task Index_ReturnsViewResult_WithDashboardVM()
         {
             // Arrange
-            var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3MDEifQ.abc123"; // Mock JWT token with userId = 701
+            var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3MDIifQ.abc123"; // Mock JWT token with userId = 702
             _controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext

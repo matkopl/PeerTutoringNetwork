@@ -2,42 +2,41 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using BL.Models;
 using PeerTutoringNetwork.Viewmodels;
+using BL.Models;
+using PeerTutoringNetwork.DesignPatterns;
 
 namespace PeerTutoringNetwork.Controllers
 {
     public class SubjectsController : Controller
     {
-        private readonly PeerTutoringNetworkContext _context;
+        private readonly IRepository<Subject> _subjectRepository;
+        private readonly IFactory<Subject, SubjectVM> _subjectFactory;
+        private readonly IUtils _utils;
 
-        public SubjectsController(PeerTutoringNetworkContext context)
+        public SubjectsController(
+            IRepository<Subject> subjectRepository,
+            IFactory<Subject, SubjectVM> subjectFactory,
+            IUtils utils)
         {
-            _context = context;
+            _subjectRepository = subjectRepository;
+            _subjectFactory = subjectFactory;
+            _utils = utils;
         }
 
         // GET: Subjects
         public async Task<IActionResult> Index()
         {
-            var subjects = await _context.Subjects
-                .Include(s => s.CreatedByUser)
-                .Select(s => new SubjectVM
-                {
-                    SubjectId = s.SubjectId,
-                    SubjectName = s.SubjectName,
-                    Description = s.Description,
-                    CreatedByUsername = s.CreatedByUser.Username,
-                    CreatedByUserId = s.CreatedByUserId
-                }).ToListAsync();
-
-            return View(subjects);
+            var subjects = await _subjectRepository.GetAllAsync();
+            var subjectsVM = subjects.Select(s => _subjectFactory.CreateVM(s)).ToList();
+            return View(subjectsVM);
         }
 
         // GET: Subjects/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["CreatedByUserId"] = new SelectList(_context.Users, "UserId", "Username");
+            var users = await _utils.GetUsersAsync();
+            ViewData["CreatedByUserId"] = new SelectList(users, "UserId", "Username");
             return View();
         }
 
@@ -46,40 +45,31 @@ namespace PeerTutoringNetwork.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("SubjectName,Description,CreatedByUserId")] SubjectVM subjectVM)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var subject = new Subject
-                {
-                    SubjectName = subjectVM.SubjectName,
-                    Description = subjectVM.Description,
-                    CreatedByUserId = subjectVM.CreatedByUserId
-                };
-
-                _context.Add(subject);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var users = await _utils.GetUsersAsync();
+                ViewData["CreatedByUserId"] = new SelectList(users, "UserId", "Username", subjectVM.CreatedByUserId);
+                return View(subjectVM);
             }
-            ViewData["CreatedByUserId"] = new SelectList(_context.Users, "UserId", "Username", subjectVM.CreatedByUserId);
-            return View(subjectVM);
+
+            var subject = _subjectFactory.CreateModel(subjectVM);
+            await _subjectRepository.AddAsync(subject);
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Subjects/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null) return NotFound();
+            var subject = await _subjectRepository.GetByIdAsync(id);
 
-            var subject = await _context.Subjects.FindAsync(id);
-            if (subject == null) return NotFound();
-
-            var subjectVM = new SubjectVM
+            if (subject == null)
             {
-                SubjectId = subject.SubjectId,
-                SubjectName = subject.SubjectName,
-                Description = subject.Description,
-                CreatedByUserId = subject.CreatedByUserId
-            };
+                return NotFound();
+            }
 
-            ViewData["CreatedByUserId"] = new SelectList(_context.Users, "UserId", "Username", subject.CreatedByUserId);
+            var subjectVM = _subjectFactory.CreateVM(subject);
+            var users = await _utils.GetUsersAsync();
+            ViewData["CreatedByUserId"] = new SelectList(users, "UserId", "Username", subjectVM.CreatedByUserId);
             return View(subjectVM);
         }
 
@@ -88,53 +78,32 @@ namespace PeerTutoringNetwork.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("SubjectId,SubjectName,Description,CreatedByUserId")] SubjectVM subjectVM)
         {
-            if (id != subjectVM.SubjectId) return NotFound();
+            if (id != subjectVM.SubjectId)
+                return NotFound(); 
 
-            if (ModelState.IsValid)
+            var existingSubject = await _subjectRepository.GetByIdAsync(id);
+            if (existingSubject == null)
+                return NotFound(); 
+
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    var subject = new Subject
-                    {
-                        SubjectId = subjectVM.SubjectId,
-                        SubjectName = subjectVM.SubjectName,
-                        Description = subjectVM.Description,
-                        CreatedByUserId = subjectVM.CreatedByUserId
-                    };
-
-                    _context.Update(subject);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!SubjectExists(subjectVM.SubjectId)) return NotFound();
-                    throw;
-                }
-                return RedirectToAction(nameof(Index));
+                var users = await _utils.GetUsersAsync();
+                ViewData["CreatedByUserId"] = new SelectList(users, "UserId", "Username", subjectVM.CreatedByUserId);
+                return View(subjectVM);
             }
 
-            ViewData["CreatedByUserId"] = new SelectList(_context.Users, "UserId", "Username", subjectVM.CreatedByUserId);
-            return View(subjectVM);
+            var subject = _subjectFactory.CreateModel(subjectVM);
+            await _subjectRepository.UpdateAsync(subject);
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Subjects/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null) return NotFound();
-
-            var subject = await _context.Subjects
-                .Include(s => s.CreatedByUser)
-                .FirstOrDefaultAsync(m => m.SubjectId == id);
+            var subject = await _subjectRepository.GetByIdAsync(id);
             if (subject == null) return NotFound();
 
-            var subjectVM = new SubjectVM
-            {
-                SubjectId = subject.SubjectId,
-                SubjectName = subject.SubjectName,
-                Description = subject.Description,
-                CreatedByUsername = subject.CreatedByUser.Username
-            };
-
+            var subjectVM = _subjectFactory.CreateVM(subject);
             return View(subjectVM);
         }
 
@@ -143,47 +112,19 @@ namespace PeerTutoringNetwork.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var subject = await _context.Subjects.FindAsync(id);
-            if (subject != null)
-            {
-                _context.Subjects.Remove(subject);
-                await _context.SaveChangesAsync();
-            }
-
+            await _subjectRepository.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool SubjectExists(int id)
-        {
-            return _context.Subjects.Any(e => e.SubjectId == id);
-        }
-
         // GET: Subjects/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var subject = await _context.Subjects
-                .Include(s => s.CreatedByUser)
-                .FirstOrDefaultAsync(s => s.SubjectId == id);
+            var subject = await _subjectRepository.GetByIdAsync(id);
+            if (subject == null) return NotFound();
 
-            if (subject == null)
-            {
-                return NotFound();
-            }
-
-            var subjectVM = new SubjectVM
-            {
-                SubjectId = subject.SubjectId,
-                SubjectName = subject.SubjectName,
-                Description = subject.Description,
-                CreatedByUserId = subject.CreatedByUserId,
-                CreatedByUsername = subject.CreatedByUser.Username
-            };
-
+            var subjectVM = _subjectFactory.CreateVM(subject);
             return View(subjectVM);
         }
     }
