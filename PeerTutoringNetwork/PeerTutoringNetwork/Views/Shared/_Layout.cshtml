@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Peer Tutoring Network</title>
 
-    <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"></link>
-
+    <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css" />
     <script src="https://kit.fontawesome.com/d185203d23.js" crossorigin="anonymous"></script>
 </head>
 <body>
@@ -19,15 +18,14 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a href="/MentorDashboard/Index" class="navbar-brand">Mentor Dashboard</a>
+                <span class="navbar-brand">Peer Tutoring Network</span>
             </div>
             <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li><a href="/MentorDashboard/Index">Home</a></li>
-                    <li><a href="/Appointments">Appointments</a></li>
-                    <li><a href="@Url.ActionLink("Calendar", "Appointments")">Calendar</a></li>
-                    <li><a href="@Url.Action("Index", "Chat")">Chat</a></li>
-                    <li><a href="/Subjects">Subjects</a></li>
+                <ul class="nav navbar-nav" id="navbarMenu">
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/Profile.html"><i class="fas fa-user"></i> View Profile</a></li>
+                    <li><a href="#" id="logoutButton"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                 </ul>
             </div>
         </div>
@@ -43,15 +41,61 @@
         </footer>
     </div>
 
-        <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.3.1.min.js"
-                crossorigin="anonymous"
-                integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT">
-        </script>
-        <script src="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/bootstrap.min.js"
-                crossorigin="anonymous"
-                integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa">
-        </script>
-        <script src="https://kit.fontawesome.com/d185203d23.js" crossorigin="anonymous"></script>
+    <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.3.1.min.js"></script>
+    <script src="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/bootstrap.min.js"></script>
+    <script type="module">
+        import jwt_decode from "https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.esm.js";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const token = localStorage.getItem("jwtToken");
+
+            if (!token) {
+                alert("You are not logged in!");
+                window.location.href = "/Login.html";
+                return;
+            }
+
+            try {
+                const decodedToken = jwt_decode(token);
+                const roleId = decodedToken.roleId || decodedToken.role;
+                if (!roleId) throw new Error("Missing role ID in the token");
+
+                const navbarMenu = document.getElementById("navbarMenu");
+
+                // Render navbar items based on role
+                if (roleId == 1) { // Student
+                    navbarMenu.innerHTML = `
+                                <li><a href="/StudentDashboard/Index">Home</a></li>
+                                <li><a href=@Url.Action("Index", "Chat")>Chat</a></li>
+                            `;
+                } else if (roleId == 2) { // Mentor
+                    navbarMenu.innerHTML = `
+                                <li><a href="/MentorDashboard/Index">Home</a></li>
+                                <li><a href="/Appointments">Appointments</a></li>
+                                <li><a href=@Url.ActionLink("Calendar", "Appointments")>Calendar</a></li>
+                                <li><a href="/Subjects">Subjects</a></li>
+                                <li><a href=@Url.Action("Index", "Chat")>Chat</a></li>
+                            `;
+                } else if (roleId == 3) { // Admin
+                    window.location.href = "/Admin.html";
+                } else {
+                    throw new Error("Unknown role ID.");
+                }
+            } catch (error) {
+                console.error("Error decoding JWT:", error);
+                alert("Invalid session or role. Please log in again.");
+                localStorage.removeItem("jwtToken");
+                window.location.href = "/Login.html";
+            }
+
+            // Logout functionality
+            document.getElementById("logoutButton").addEventListener("click", () => {
+                localStorage.removeItem("jwtToken");
+                alert("Successfully logged out!");
+                window.location.href = "/Login.html";
+            });
+        });
+    </script>
 
     @RenderSection("Scripts", required: false)
 </body>

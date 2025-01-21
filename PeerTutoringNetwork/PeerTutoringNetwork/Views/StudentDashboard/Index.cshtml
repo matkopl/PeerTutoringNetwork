@@ -7,20 +7,8 @@
 
 <div class="container">
     <h1 class="text-center"><i class="fas fa-user-graduate"></i> Student Dashboard</h1>
-
-    <!-- Quick Actions -->
-    <div class="row text-center mb-4">
-        <div class="col-md-6">
-            <button class="btn btn-primary" onclick="window.location.href='/Profile.html'">
-                <i class="fas fa-user"></i> View Profile
-            </button>
-        </div>
-        <div class="col-md-6">
-            <button class="btn btn-danger" onclick="logout()">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
-        </div>
-    </div>
+    
+    <br/>
 
     <hr>
 
@@ -106,12 +94,6 @@
         }
     }
 
-    function logout() {
-        localStorage.removeItem("jwtToken");
-        alert("Successfully logged out!");
-        window.location.href = "/Login.html";
-    }
-
     document.addEventListener("DOMContentLoaded", () => {
         const token = localStorage.getItem("jwtToken");
         const userInfo = getUserIdFromToken(token);
@@ -122,38 +104,43 @@
             return;
         }
 
+        // Populate hidden form fields with user information
         document.querySelectorAll(".reserve-form").forEach((form) => {
             form.querySelector("#StudentId").value = userInfo.userId;
             form.querySelector("#ReservationTime").value = new Date().toISOString();
         });
 
         document.querySelectorAll(".reserve-btn").forEach((button) => {
-            button.addEventListener("click", (e) => {
+            button.addEventListener("click", async (e) => {
+                e.preventDefault();
                 const form = e.target.closest(".reserve-form");
                 const formData = new FormData(form);
 
-                fetch(form.action, {
-                    method: "POST",
-                    body: formData,
-                    headers: {
-                        "RequestVerificationToken": form.querySelector("input[name='__RequestVerificationToken']").value,
-                    },
-                })
-                    .then((response) => {
-                        if (response.ok) {
-                            alert("Appointment reserved successfully!");
-                            location.reload();
-                        } else {
-                            return response.text().then((text) => {
-                                alert("Failed to reserve appointment: " + text);
-                            });
-                        }
-                    })
-                    .catch((error) => console.error("Error reserving appointment:", error));
+                try {
+                    const response = await fetch(form.action, {
+                        method: "POST",
+                        body: formData,
+                        headers: {
+                            "RequestVerificationToken": form.querySelector("input[name='__RequestVerificationToken']").value,
+                        },
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        alert(result.message || "Appointment reserved successfully!");
+                        location.reload(); // Refresh the page to show updated data
+                    } else if (response.status === 409) {
+                        const text = await response.text();
+                        alert(`Conflict: ${text}`);
+                    } else {
+                        const text = await response.text();
+                        alert(`Failed to reserve appointment: ${text}`);
+                    }
+                } catch (error) {
+                    console.error("Error reserving appointment:", error);
+                    alert("An unexpected error occurred.");
+                }
             });
         });
-
-
-        window.logout = logout;
     });
 </script>

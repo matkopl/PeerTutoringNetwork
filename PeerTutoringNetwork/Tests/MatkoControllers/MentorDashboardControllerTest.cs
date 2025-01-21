@@ -5,6 +5,7 @@ using BL.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PeerTutoringNetwork.Controllers;
+using PeerTutoringNetwork.DesignPatterns;
 using PeerTutoringNetwork.Viewmodels;
 using Xunit;
 
@@ -14,12 +15,13 @@ namespace Matko.Tests
     {
         private readonly PeerTutoringNetworkContext _context;
         private readonly MentorDashboardController _controller;
+        private readonly DashboardFacade _dashboardFacade;
 
         public MentorDashboardControllerTests()
         {
             // Set up the in-memory database
             var options = new DbContextOptionsBuilder<PeerTutoringNetworkContext>()
-                .UseInMemoryDatabase(databaseName: "TestMentorDashboard")
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
 
             _context = new PeerTutoringNetworkContext(options);
@@ -28,7 +30,8 @@ namespace Matko.Tests
             SeedDatabase();
 
             // Initialize the controller
-            _controller = new MentorDashboardController(_context);
+            _dashboardFacade = new DashboardFacade(_context);
+            _controller = new MentorDashboardController(_context, _dashboardFacade);
         }
 
         private void SeedDatabase()
@@ -68,9 +71,9 @@ namespace Matko.Tests
 
             var appointments = new List<Appointment>
             {
-                new Appointment { AppointmentId = 401, MentorId = 201, SubjectId = 301, AppointmentDate = System.DateTime.Now.AddDays(-1) },
-                new Appointment { AppointmentId = 402, MentorId = 201, SubjectId = 302, AppointmentDate = System.DateTime.Now.AddDays(-2) },
-                new Appointment { AppointmentId = 403, MentorId = 201, SubjectId = 303, AppointmentDate = System.DateTime.Now.AddDays(-3) }
+                new Appointment { AppointmentId = 401, MentorId = 202, SubjectId = 301, AppointmentDate = System.DateTime.Now.AddDays(-1) },
+                new Appointment { AppointmentId = 402, MentorId = 202, SubjectId = 302, AppointmentDate = System.DateTime.Now.AddDays(-2) },
+                new Appointment { AppointmentId = 403, MentorId = 202, SubjectId = 303, AppointmentDate = System.DateTime.Now.AddDays(-3) }
             };
 
             _context.Users.AddRange(users);

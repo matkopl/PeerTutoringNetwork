@@ -10,6 +10,9 @@ using BL.Repositories;
 using BL.lnterfaces;
 using BL.Services;
 using BL.Hubs;
+using PeerTutoringNetwork.DesignPatterns;
+using PeerTutoringNetwork.Viewmodels;
+using PeerTutoringNetwork.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +21,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IUserService, UserService>();
+
+builder.Services.AddScoped<IRepository<Subject>, SubjectRepository>();
+builder.Services.AddScoped<IFactory<Subject, SubjectVM>, SubjectFactory>();
+builder.Services.AddScoped<IUtils, Utils>();
+builder.Services.AddScoped<IRepository<AppointmentReservation>, ReservationRepository>();
+builder.Services.AddScoped<IFactory<AppointmentReservation, ReservationVM>, ReservationFactory>();
+builder.Services.AddScoped<DashboardFacade>();
+
+builder.Services.AddSingleton<ISubject, ReservationNotifier>();
+builder.Services.AddSingleton<IObserver, ReservationLogger>();
 
 builder.Services.AddSignalR();
 
@@ -89,6 +102,12 @@ builder.Services
 
 
 var app = builder.Build();
+
+var reservationNotifier = app.Services.GetService<ISubject>();
+var reservationLogger = app.Services.GetService<IObserver>();
+
+reservationNotifier?.Attach(reservationLogger);
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
